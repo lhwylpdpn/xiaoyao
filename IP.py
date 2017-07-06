@@ -101,16 +101,16 @@ def status_success():
 		return 1
 	else:
 		return 0
+def main_():
+
+	if init()==1:
+		disconnect()
+		while 1:
+
+			if status_success()==0:
+				connect()
+			else:
+				break
+		print(GET_IP_Connect())
 if __name__ == '__main__':
-	for x in xrange(1,10):
-
-		if init()==1:
-			disconnect()
-			while 1:
-
-				if status_success()==0:
-					connect()
-				else:
-					break
-			print(GET_IP_Connect())
-			disconnect()
+	connect()
