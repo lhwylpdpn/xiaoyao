@@ -35,27 +35,33 @@ def getpro_vivo():
 	return prop
 
 if __name__ == '__main__':
-	update_device_info.open_device()#连接 adb connect
+	# update_device_info.open_device()#连接 adb connect
 
 
-	#######
-	prop=[]
-	prop=getpro_vivo()
+	# #######
+	# prop=[]
+	# prop=getpro_vivo()
 
-	for x in xrange(0,len(prop)):
-		print('monkeyrunner '+os.getcwd()+'\\vivo.py '+str(prop[x][0])+' '+str(prop[x][1])+' '+str(prop[x][2])+' '+str(prop[x][3])+' '+str(prop[x][4])+' '+str(prop[x][5])+' '+str(prop[x][6])+' '+str(prop[x][7])+' '+str(prop[x][8])+' '+str(prop[x][9])+' '+str(prop[x][10])+' '+str(prop[x][11])+' '+str(prop[x][12])+' ')
-		#解析开回来的每个prop，然后拼成多个参数给到monkey
-		#monkey 执行，存结果日志
-
-
-		while 1:
-			try:
-				IP.main_()
-				update_device_info.setproperty(prop)
-				break
-			except:
-				print("error ip")
-		info=os.popen('monkeyrunner '+os.getcwd()+'\\vivo.py '+str(prop[x][0])+' '+str(prop[x][1])+' '+str(prop[x][2])+' '+str(prop[x][3])+' '+str(prop[x][4])+' '+str(prop[x][5])+' '+str(prop[x][6])+' '+str(prop[x][7])+' '+str(prop[x][8])+' '+str(prop[x][9])+' '+str(prop[x][10])+' '+str(prop[x][11])+' '+str(prop[x][12])+' ')
-		print(info.read())
+	# for x in xrange(0,len(prop)):
+	# 	print('monkeyrunner '+os.getcwd()+'\\vivo.py '+str(prop[x][0])+' '+str(prop[x][1])+' '+str(prop[x][2])+' '+str(prop[x][3])+' '+str(prop[x][4])+' '+str(prop[x][5])+' '+str(prop[x][6])+' '+str(prop[x][7])+' '+str(prop[x][8])+' '+str(prop[x][9])+' '+str(prop[x][10])+' '+str(prop[x][11])+' '+str(prop[x][12])+' ')
+	# 	#解析开回来的每个prop，然后拼成多个参数给到monkey
+	# 	#monkey 执行，存结果日志
 
 
+	# while 1:
+	# 	try:
+	IP.main_()
+	print(3)
+	update_device_info.setproperty()
+	print(2)
+
+		# except:
+		# 	print("error ip")
+	# 	if int(prop[x][7])+int(prop[x][8])+int(prop[x][9])+int(prop[x][10])+int(prop[x][11])+int(prop[x][12])>0:
+
+	# 		info=os.popen('monkeyrunner '+os.getcwd()+'\\vivo.py '+str(prop[x][0])+' '+str(prop[x][1])+' '+str(prop[x][2])+' '+str(prop[x][3])+' '+str(prop[x][4])+' '+str(prop[x][5])+' '+str(prop[x][6])+' '+str(prop[x][7])+' '+str(prop[x][8])+' '+str(prop[x][9])+' '+str(prop[x][10])+' '+str(prop[x][11])+' '+str(prop[x][12])+' '+str(x))
+	# 		print(info.read())
+	# 	else:
+	# 		print('no money to send')
+	# print(3)
+	# print(os.popen('python test.py').read())

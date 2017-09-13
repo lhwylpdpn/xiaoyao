@@ -18,19 +18,30 @@ if not os.path.exists(path):
 	os.mkdir(path)
 if not os.path.exists(path_money):
 	os.mkdir(path_money)
+
+
+global device
+global eDevice
+global hViewer
+
+
 device=mr.waitForConnection() 
 if not device:
     print("Please connect a device to start!")
   
 else:
     print("Device Connected successfully!")
-time.sleep(3)
+time.sleep(2)
 eDevice=EasyMonkeyDevice(device)
 hViewer = device.getHierarchyViewer()
 global LOG
 LOG=" ".join(argv[1:len(argv)])+"\n"
 def login_vivo():
-	#device.startActivity("com.zlongame.fszhs.vivo/com.amazing.flex.GameActivity")
+	global device
+	global eDevice
+	global hViewer
+
+		#device.startActivity("com.zlongame.fszhs.vivo/com.amazing.flex.GameActivity")
 	device.startActivity("com.vivo.game/com.vivo.game.ui.GameTabActivity")
 	time.sleep(3)
 	#跳转到我的页面
@@ -68,6 +79,10 @@ def login_vivo():
 		device.touch(view.x,view.y,'DOWN_AND_UP')
 
 def logout_vivo():
+	global device
+	global eDevice
+	global hViewer
+
 	device.startActivity("com.vivo.game/com.vivo.game.ui.GameTabActivity")
 	time.sleep(3)
  
@@ -117,31 +132,111 @@ def logout_vivo():
 		time.sleep(1)
 		device.touch((display_w-v_w)/2+view.x,(display_h-v_h)/2+ptop+view.y,'DOWN_AND_UP')
 
-def game_login_vivo(number,pwd,server_id):
- 	global LOG
-	device.startActivity("com.zlongame.fszhs.vivo/com.amazing.flex.GameActivity")
+def vivo_close_gonggao():
+	global device
+	global eDevice
+	global hViewer
+	global LOG
+	i=0
 	time.sleep(2)
 
-	while 1:#捕捉更换账号的地方
-		print(1)
+	while i<5:#跳过游戏公告 
+		print(3335)
+		i=i+1
+		time.sleep(2)
 
-		if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and  eDevice.visible(By.id('id/vivo_login_loading_switch')):
-			device.touch(640,415,'DOWN_AND_UP')
-
-			LOG=LOG+'捕捉vivo更换账号成功'+'\n'
+		print(hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity')
+		print(eDevice.visible(By.id('id/vivo_acts_mutitxt_dialog_close')))
+		print(eDevice.visible(By.id('id/vivo_acts_singletxt_dialog_close')))
+		if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and  (eDevice.visible(By.id('id/vivo_acts_mutitxt_dialog_close')) or eDevice.visible(By.id('id/vivo_acts_singletxt_dialog_close'))):
+			
+			LOG=LOG+'跳过公告成功'+'\n'
 			break
-	time.sleep(3)
-	while 1:#点击退出现有账号
-		print(2)
-		if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and  eDevice.exists(By.id('id/sublist_account_exit')):
- 			print(4444)
+
+	while 1:
+		if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity':
+			time.sleep(1)
+			if eDevice.visible(By.id('id/vivo_acts_singletxt_dialog_close')):
+				v=hViewer.findViewById('id/vivo_acts_singletxt_dialog_close')
+			if eDevice.visible(By.id('id/vivo_acts_mutitxt_dialog_close')):
+				v=hViewer.findViewById('id/vivo_acts_mutitxt_dialog_close')
+			view=hViewer.getAbsoluteCenterOfView(v)
+			v2=hViewer.findViewById('id/content')
+			view2=hViewer.getAbsolutePositionOfView(v2)
+
+			v_h=int(v2.height)
+			v_w=int(v2.width)
+		 
+
+
+			display_h=int(720)#经常读取不到，索性写死
+			display_w=int(1280)
+		 	print((display_w-v_w)/2+view.x,(display_h-v_h)/2+view.y)
+		 	time.sleep(2)
+			device.touch((display_w-v_w)/2+view.x,(display_h-v_h)/2+view.y,'DOWN_AND_UP')
+		else:
+			break
+		print(344555)
+	time.sleep(1)
+
+def game_login_vivo(number,pwd,server_id):
+	global device
+	global eDevice
+	global hViewer
+ 	global LOG
+	device.startActivity("com.zlongame.fszhs.vivo/com.amazing.flex.GameActivity")
+
+	vivo_close_gonggao()
+	time.sleep(2)
+
+	while 1:#点击进入选取服务器页面
+		if hViewer.getFocusedWindowName()=='com.zlongame.fszhs.vivo/com.amazing.flex.GameActivity':
+			print(222)
+			LOG=LOG+'进入服务器选择页面成功B'+'\n'
+			break
+	print(33333)
+	time.sleep(2)
+	device.touch(640,650,'DOWN_AND_UP')
+
+	print("click fuwuqi ok")
+	time.sleep(2)
+	
+
+
+	while 1:#捕捉更换账号的地方
+
+		device.touch(1238,560,'DOWN_AND_UP')#点击切换账号部分
+
+		print(1)
+		i1=0
+		i2=0
+		while 1:
+			if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity':
+				break
+		print(4,hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity')
+		print(4,eDevice.visible(By.id('id/vivo_login_loading_switch')))
+		if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and  eDevice.visible(By.id('id/vivo_login_loading_switch')):
+			time.sleep(1)
+			print("tttt")
+			device.touch(640,415,'DOWN_AND_UP')
+			i1=1
+			LOG=LOG+'捕捉vivo更换账号成功'+'\n'
+		time.sleep(2)
+		print( hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity')
+		print( eDevice.visible(By.id('id/sublist_account_exit')))	
+		if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and  eDevice.visible(By.id('id/sublist_account_exit')):
+ 			i2=1
 			device.touch(490,261,'DOWN_AND_UP')
 			LOG=LOG+'退出vivo账号成功'+'\n'
+		
+		if i1==1 and i2==1:
 			break
-	time.sleep(3)
+		else:
+			vivo_close_gonggao()
 	while 1:#输入用户名密码
 		print(3)
-		if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and  eDevice.exists(By.id('id/account_num_input')):
+		time.sleep(2)
+		if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and  eDevice.visible(By.id('id/account_num_input')):
  			print(555)
  			device.touch(700,298,'DOWN_AND_UP')
 			for x in xrange(1,50):
@@ -155,45 +250,23 @@ def game_login_vivo(number,pwd,server_id):
  			LOG=LOG+'重新输入用户名密码成功'+'\n'
 			break
 
-	time.sleep(3)
+	vivo_close_gonggao()
 
-	while 1:#跳过游戏公告 
-		print(3335)
-		if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and  eDevice.exists(By.id('id/content')):
-			LOG=LOG+'跳过公告成功'+'\n'
-			break
-	v=hViewer.findViewById('id/content')
-	view=hViewer.getAbsoluteCenterOfView(v.children[0].children[0].children[1])
-	v2=hViewer.findViewById('id/content')
-	view2=hViewer.getAbsolutePositionOfView(v2)
-
-	v_h=int(v2.height)
-	v_w=int(v2.width)
- 
-	
-	display_h=int(device.getProperty('display.height'))
-	display_w=int(device.getProperty('display.width'))
- 
-	device.touch((display_w-v_w)/2+view.x,(display_h-v_h)/2+view.y,'DOWN_AND_UP')
-
-	while 1:#点击进入选取服务器页面
-		if hViewer.getFocusedWindowName()=='com.zlongame.fszhs.vivo/com.amazing.flex.GameActivity':
-			LOG=LOG+'进入服务器选择页面成功'+'\n'
-			break
-	device.touch(640,650,'DOWN_AND_UP')
-	time.sleep(3)
 	while 1:#打开选服页面
 		if hViewer.getFocusedWindowName()=='com.zlongame.fszhs.vivo/com.amazing.flex.GameActivity':
 			device.touch(798,563,'DOWN_AND_UP') 
 			LOG=LOG+'打开选择服务器页面成功'+'\n'
 			break	
-	time.sleep(3)
+	time.sleep(2)
 	choose_server(int(server_id))
 	LOG=LOG+'选择服务器成功'+'\n'
-	time.sleep(3)	
+	time.sleep(2)	
 	device.touch(640,645,'DOWN_AND_UP') #开始游戏的大按钮
 	LOG=LOG+'进入游戏成功'+'\n'
 def account_need_createRole():
+	global device
+	global eDevice
+	global hViewer
 	global LOG
 	for x in xrange(1,10):#创建角色
 		device.touch(1100,660,'DOWN_AND_UP')
@@ -208,29 +281,32 @@ def account_need_createRole():
 		device.touch(65,65,'DOWN_AND_UP')#点击头像
 		time.sleep(1)
 		device.touch(1050,435,'DOWN_AND_UP')#点击复制roleid
-	device.press('KEYCODE_HOME', md.DOWN_AND_UP)
-	time.sleep(1)
-	v=hViewer.findViewById('id/show_text')
-	view=hViewer.getAbsoluteCenterOfView(v)
-	device.touch(view.x,view.y,'DOWN_AND_UP')
-	time.sleep(1)
-	v=hViewer.findViewById('id/editText')
-	view=hViewer.getAbsoluteCenterOfView(v)
-	device.touch(view.x,view.y,'DOWN_AND_UP')
-	for x in xrange(1,50):
-		device.press("KEYCODE_DEL",md.DOWN)
-	device.touch(view.x,view.y,md.DOWN)
-	time.sleep(2)
-	device.touch(view.x,view.y,md.UP)
-	device.touch(160,170,'DOWN_AND_UP')
-	device.touch(160,170,'DOWN_AND_UP')
-	v=hViewer.findViewById('id/editText')
-	print(hViewer.getText(v).encode('UTF8'))
-	device.startActivity("com.zlongame.fszhs.vivo/com.amazing.flex.GameActivity")
-	time.sleep(3)
+	# device.press('KEYCODE_HOME', md.DOWN_AND_UP)
+	# time.sleep(1)
+	# v=hViewer.findViewById('id/show_text')
+	# view=hViewer.getAbsoluteCenterOfView(v)
+	# device.touch(view.x,view.y,'DOWN_AND_UP')
+	# time.sleep(1)
+	# v=hViewer.findViewById('id/editText')
+	# view=hViewer.getAbsoluteCenterOfView(v)
+	# device.touch(view.x,view.y,'DOWN_AND_UP')
+	# for x in xrange(1,50):
+	# 	device.press("KEYCODE_DEL",md.DOWN)
+	# device.touch(view.x,view.y,md.DOWN)
+	# time.sleep(2)
+	# device.touch(view.x,view.y,md.UP)
+	# device.touch(160,170,'DOWN_AND_UP')
+	# device.touch(160,170,'DOWN_AND_UP')
+	# v=hViewer.findViewById('id/editText')
+	# print(hViewer.getText(v).encode('UTF8'))
+	# device.startActivity("com.zlongame.fszhs.vivo/com.amazing.flex.GameActivity")
+	# time.sleep(3)
 	device.touch(1125,100,'DOWN_AND_UP')	
-	LOG=LOG+'创建角色或者记录ID成功'+' '+str(hViewer.getText(v).encode('UTF8'))+'\n'
+	# LOG=LOG+'创建角色或者记录ID成功'+' '+str(hViewer.getText(v).encode('UTF8'))+'\n'
 def get_exp(number,server_id):
+	global device
+	global eDevice
+	global hViewer
 
 	time.sleep(10)
 	device.touch(390,110,'DOWN_AND_UP')	#打开经验邮件
@@ -242,22 +318,30 @@ def get_exp(number,server_id):
 	img.writeToFile(path+str(number)+"_"+str(server_id)+"_"+str(datetime.datetime.now().strftime('%Y-%m-%d %H-%M-%S'))+".jpg",'jpg')
 	LOG=LOG+'领取经验成功'+'\n'
 def game_close_vivo():
+	global device
+	global eDevice
+	global hViewer
 	# device.touch(65,65,'DOWN_AND_UP')
 	# time.sleep(1)
 	# device.touch(655,505,'DOWN_AND_UP')
 	# time.sleep(1)
 	# device.touch(640,485,'DOWN_AND_UP')	
 	device.press("KEYCODE_BACK",md.DOWN_AND_UP)
-	time.sleep(1)
+	time.sleep(2)
 	device.touch(546,423,'DOWN_AND_UP')	
+	time.sleep(2)
 def choose_server(serverid):
 	server_id=int(serverid)
-	server_list_2=(350,575)#顺序第七位，目前是硬核一区
-	server_list_3=(350,505)#顺序第六位，目前是硬核二区，以后可能下移
-	server_list_4=(350,435)#顺序第五位，目前是硬核三区，以后可能下移
-	server_list_5=(350,365)#顺序第四位，目前是硬核四区，以后可能下移
-	server_list_6=(350,295)#顺序第三位，目前是硬核五区，以后可能下移
+	server_list_4=(350,575)#顺序第七位，
+	server_list_5=(350,505)#顺序第六位，
+	server_list_6=(350,435)#顺序第五位，
+	server_list_7=(350,365)#顺序第四位，
+	server_list_8=(350,295)#顺序第三位，
+
 	server_list_1=(350,625)#向上拖动后，第一位置
+	server_list_2=(350,555)#向上拖动后，第二位置
+	server_list_3=(350,485)#向上拖动后，第三位置
+
 	#每个list有16个server ，但是显示区默认分12个位置
 	# 12,11
 	# 10,9
@@ -298,13 +382,19 @@ def choose_server(serverid):
 		device.drag(server_position[0],server_position[10],1,1)
 		time.sleep(3)
 		device.touch(server_position[server_id-1][0],server_position[server_id-1][1],'DOWN_AND_UP') 
+		
+
 		#list2
 	if server_id<=32 and server_id>=21:
-
+		device.drag((350,625),(350,100),1,1) #拖到底，让最底下是硬核一区
+		time.sleep(3)
 		device.touch(server_list_2[0],server_list_2[1],'DOWN_AND_UP')
 		time.sleep(3)
 		device.touch(server_position[server_id-21][0],server_position[server_id-21][1],'DOWN_AND_UP') 
 	if server_id<=20 and server_id>=17:
+		device.drag((350,625),(350,100),1,1) #拖到底，让最底下是硬核一区
+		time.sleep(3)
+
 		device.touch(server_list_2[0],server_list_2[1],'DOWN_AND_UP')
  
 		time.sleep(3)
@@ -354,9 +444,38 @@ def choose_server(serverid):
 		device.touch(server_position[server_id-65][0],server_position[server_id-65][1],'DOWN_AND_UP') 
 
 
+		#list6
+	if server_id<=96 and server_id>=85:
+		device.touch(server_list_6[0],server_list_6[1],'DOWN_AND_UP')
+		time.sleep(3)
+		device.touch(server_position[server_id-85][0],server_position[server_id-85][1],'DOWN_AND_UP') 
+	if server_id<=84 and server_id>=81:
+		device.touch(server_list_6[0],server_list_6[1],'DOWN_AND_UP')
+ 
+		time.sleep(3)
+		device.drag(server_position[0],server_position[10],1,1)
+		time.sleep(3)
+		device.touch(server_position[server_id-81][0],server_position[server_id-81][1],'DOWN_AND_UP') 
+		
+		#list7
+	if server_id<=112 and server_id>=101:
+		device.touch(server_list_7[0],server_list_7[1],'DOWN_AND_UP')
+		time.sleep(3)
+		device.touch(server_position[server_id-101][0],server_position[server_id-101][1],'DOWN_AND_UP') 
+	if server_id<=100 and server_id>=97:
+		device.touch(server_list_7[0],server_list_7[1],'DOWN_AND_UP')
+ 
+		time.sleep(3)
+		device.drag(server_position[0],server_position[10],1,1)
+		time.sleep(3)
+		device.touch(server_position[server_id-97][0],server_position[server_id-97][1],'DOWN_AND_UP') 
+		
 
 
 def money_insert(money,number,server_id):
+	global device
+	global eDevice
+	global hViewer
 	global LOG
 
 	server_position=[]
@@ -511,6 +630,9 @@ def money_insert(money,number,server_id):
 		time.sleep(3)
 		money_pay_V(money,number,server_id)
 def money_pay_V(money,number,server_id):
+	global device
+	global eDevice
+	global hViewer
 	tag=0
 	global LOG
 	while 1:
@@ -575,6 +697,9 @@ def money_pay_V(money,number,server_id):
 				LOG=LOG+'充值成功'+str(money)+'\n'
 				break
 def get_balance():
+	global device
+	global eDevice
+	global hViewer
 	global LOG
 
 	server_position=[]
@@ -608,14 +733,15 @@ def get_balance():
 			balance_price_result=hViewer.getText(v)
 			print(re.sub("\D","",balance_price_result))
 			LOG=LOG+'剩余金额'+str(re.sub("\D","",balance_price_result))+'\n'
-			device.press("KEYCODE_BACK",md.DOWN_AND_UP)
-			time.sleep(1)
-			device.touch(545,430,'DOWN_AND_UP')				
+
 			break
 def money_pay_other():
 	return 0
 
 def static_log(name):
+	global device
+	global eDevice
+	global hViewer
 	global LOG
 	file_object = open(os.getcwd()+'/'+name+'_'+str(datetime.datetime.now().strftime('%Y-%m-%d %H-%M-%S'))+'_log.csv','w')
 	file_object.write(LOG)
@@ -623,7 +749,7 @@ def static_log(name):
 	print("log is "+name)
 
 if __name__ == '__main__':
-	# try:
+	# # try:
 	
 		prop=[]#[imei,imsi,linenum,simserial,pwd,serverid,6,30,98,198,328,588,648]
 		imei=argv[1]
@@ -639,26 +765,28 @@ if __name__ == '__main__':
 		_328_=argv[11]
 		_588_=argv[12]
 		_648_=argv[13]
+
+			
 		game_login_vivo(number,pwd,server_id)
 		account_need_createRole()
 		time.sleep(3)
 		if _6_+_30_+_98_+_198_+_328_+_588_+_648_>0:
-
-			device.touch(65,125,'DOWN_AND_UP') # 启动充值部分
-		for x in xrange(0,int(_6_)):
-			money_insert(6,number,server_id)
-		for x in xrange(0,int(_30_)):
-			money_insert(30,number,server_id)
-		for x in xrange(0,int(_98_)):
-			money_insert(98,number,server_id)
-		for x in xrange(0,int(_198_)):
-			money_insert(198,number,server_id)
-		for x in xrange(0,int(_328_)):
-			money_insert(328,number,server_id)
-		for x in xrange(0,int(_588_)):
-			money_insert(588,number,server_id)
-		for x in xrange(0,int(_648_)):
-			money_insert(648,number,server_id)
+			time.sleep(5)
+		 	device.touch(65,125,'DOWN_AND_UP') # 启动充值部分
+			for x in xrange(0,int(_6_)):
+				money_insert(6,number,server_id)
+			for x in xrange(0,int(_30_)):
+				money_insert(30,number,server_id)
+			for x in xrange(0,int(_98_)):
+				money_insert(98,number,server_id)
+			for x in xrange(0,int(_198_)):
+				money_insert(198,number,server_id)
+			for x in xrange(0,int(_328_)):
+				money_insert(328,number,server_id)
+			for x in xrange(0,int(_588_)):
+				money_insert(588,number,server_id)
+			for x in xrange(0,int(_648_)):
+				money_insert(648,number,server_id)
 		get_balance()
 		static_log('vivo')
 		game_close_vivo()

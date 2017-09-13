@@ -15,12 +15,30 @@ def mac_rand():
 		Maclist.append(RANDSTR)
 	RANDMAC = ":".join(Maclist)
 	print RANDMAC
-def setproperty(prop):
+def randint_num(num):
+	r=""
+	for x in xrange(0,num):
+		r=str(random.randint(0,9))+r
+	print(r)
+	return r
+
+def setproperty():
 	#prop=[]#[imei,imsi,linenum,simserial,pwd,serverid]
 	#prop.append([123456789012344,123456789012345,'+8618600547032',12345678901234567890,'mrot8089',6])
-
-	os.popen('adb shell setprop microvirt.imei '+str(prop[0][0]))
-	os.popen('adb shell setprop microvirt.imsi '+str(prop[0][1]))
-	os.popen('adb shell setprop microvirt.linenum '+str("+86"+prop[0][2]))
-	os.popen('adb shell setprop microvirt.simserial '+str(prop[0][3]))
-	#os.popen('adb shell setprop wifi.interface.mac '+str(mac_rand()))
+	imei=str(randint_num(15))
+	imsi=str(randint_num(15))
+	linenum=str("+86186"+str(randint_num(8)))
+	simserial='89860070200779921015'
+	mac=str(mac_rand())
+	os.popen('adb shell setprop microvirt.imei '+imei)
+	os.popen('adb shell setprop microvirt.imsi '+imsi)
+	os.popen('adb shell setprop microvirt.linenum '+linenum)
+	os.popen('adb shell setprop microvirt.simserial '+simserial)
+	os.popen('adb shell setprop wifi.interface.mac '+mac)
+	print(imei)
+	print(imsi)
+	print(linenum)
+	print(simserial)
+	print(mac)
+if __name__ == '__main__':
+	setproperty()
