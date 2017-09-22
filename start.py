@@ -12,8 +12,6 @@ import urllib
 import json
 import re
 from sys import argv
-import sqlite3
-import sys
 def connect_device():
 
 	info=os.popen('adb connect 127.0.0.1:21503')
@@ -34,7 +32,7 @@ def start_device():
 def close_device():
 
 
-	cmd="taskkill /f /t /im MEmu*"
+	cmd="taskkill /f /t /im ME*"
 	subprocess.call(cmd, shell=True)
 
 def getinfo():
@@ -51,7 +49,7 @@ def getsn():
 
 def get_request_info():
 	print(1)
-	url="http://118.190.204.182:5000/getinfo?sn="+getsn()+"&username="+argv[1]
+	url="http://120.26.162.150:5000/getinfo?sn="+getsn()+"&username="+argv[1]
 	print(url)
 
 
@@ -66,33 +64,9 @@ def get_request_info():
 	res=opener.open(url)
 	updateinfo(res.read())
 
-
-def update_sqlite_for_zilong():
-	while 1:
-		print('waiting for andorid start...')
-		cmd='adb pull /data/data/com.android.providers.settings/databases/settings.db'
-		
-		process = subprocess.call(cmd, shell=True,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-		if process==0:
-			break
-	conn=sqlite3.connect('settings.db')
-	cur=conn.cursor()
-	cur.execute("DELETE FROM system where name='cymgdeviceid'")
-	conn.commit()
-	conn.close()
-	while 1:
-		print('waiting for andorid start...')
-		cmd='adb remount'
-		process = subprocess.call(cmd, shell=True,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-		cmd='adb push settings.db /data/data/com.android.providers.settings/databases/'
-		process = subprocess.call(cmd, shell=True,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-
-		if process==0:
-			break		
 def updateinfo(jsondata):
 	info=json.loads(jsondata)["body"]
 	#print(getinfo()+"\MemuHyperv VMs\MEmu\MEmu.memu")
-
 	file=open(getinfo()+"\MemuHyperv VMs\MEmu\MEmu.memu")
 	filenode=file.read()
 	file.close()
@@ -124,28 +98,7 @@ def updateinfo(jsondata):
 	file=open(getinfo()+"\MemuHyperv VMs\MEmu\MEmu.memu","w")
 	file.write(temp)
 	file.close()
-def getprop():
-	cmd='adb shell getprop wifi.interface.mac'
-	print('wifi mac:')
-	subprocess.call(cmd, shell=True)
-	cmd='adb shell getprop microvirt.imei'
-	print('imei:')
-	subprocess.call(cmd, shell=True)
-	cmd='adb shell getprop microvirt.linenum'
-	print('linenum:')
-	subprocess.call(cmd, shell=True)
-	cmd='adb shell getprop microvirt.simserial'
-	print('sn:')
-	subprocess.call(cmd, shell=True)
-	cmd='adb shell getprop ro.product.brand'
-	print('brand:')
-	subprocess.call(cmd, shell=True)
-	cmd='adb shell getprop ro.product.model'
-	print('model:')
-	subprocess.call(cmd, shell=True)
+
+
 if __name__ == '__main__':
-	close_device()
-	get_request_info()
 	start_device()
-	update_sqlite_for_zilong()
-	getprop()
