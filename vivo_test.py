@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*- 
 from sys import argv
 import sys
+import signal
 import re
 from com.android.monkeyrunner import MonkeyRunner as mr
 from com.android.monkeyrunner import MonkeyDevice as md
@@ -12,6 +13,9 @@ import time
 import types
 import os
 import datetime
+import subprocess
+import threading
+
 path='/image_levelup/'
 path_money='/image_money/'
 if not os.path.exists(path):
@@ -23,7 +27,9 @@ if not os.path.exists(path_money):
 global device
 global eDevice
 global hViewer
-
+global threads
+global t_ad_event
+threads = []
 
 device=mr.waitForConnection() 
 if not device:
@@ -146,9 +152,9 @@ def vivo_close_gonggao():
 		time.sleep(2)
 
 		print(hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity')
-		print(eDevice.visible(By.id('id/vivo_acts_mutitxt_dialog_close')))
-		print(eDevice.visible(By.id('id/vivo_acts_singletxt_dialog_close')))
-		if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and  (eDevice.visible(By.id('id/vivo_acts_mutitxt_dialog_close')) or eDevice.visible(By.id('id/vivo_acts_singletxt_dialog_close'))):
+		print(hViewer.visible(hViewer.findViewById('id/vivo_acts_mutitxt_dialog_close')))
+		print(hViewer.visible(hViewer.findViewById('id/vivo_acts_singletxt_dialog_close')))
+		if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and  (hViewer.visible(hViewer.findViewById('id/vivo_acts_mutitxt_dialog_close')) or hViewer.visible(hViewer.findViewById('id/vivo_acts_singletxt_dialog_close'))):
 			
 			LOG=LOG+'跳过公告成功'+'\n'
 			break
@@ -156,9 +162,9 @@ def vivo_close_gonggao():
 	while 1:
 		if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity':
 			time.sleep(1)
-			if eDevice.visible(By.id('id/vivo_acts_singletxt_dialog_close')):
+			if hViewer.visible(hViewer.findViewById('id/vivo_acts_singletxt_dialog_close')):
 				v=hViewer.findViewById('id/vivo_acts_singletxt_dialog_close')
-			if eDevice.visible(By.id('id/vivo_acts_mutitxt_dialog_close')):
+			if hViewer.visible(hViewer.findViewById('id/vivo_acts_mutitxt_dialog_close')):
 				v=hViewer.findViewById('id/vivo_acts_mutitxt_dialog_close')
 			view=hViewer.getAbsoluteCenterOfView(v)
 			v2=hViewer.findViewById('id/content')
@@ -178,91 +184,126 @@ def vivo_close_gonggao():
 			break
 		print(344555)
 	time.sleep(1)
-
-def game_login_vivo(number,pwd,server_id):
+	#到这应该跳过了游戏公告
+def game_login_vivo():
 	global device
 	global eDevice
 	global hViewer
  	global LOG
+ 	global t_ad_event
 	device.startActivity("com.zlongame.fszhs.vivo/com.amazing.flex.GameActivity")
 
-	vivo_close_gonggao()
-	time.sleep(2)
+	while 1:
 
-	while 1:#点击进入选取服务器页面
-		if hViewer.getFocusedWindowName()=='com.zlongame.fszhs.vivo/com.amazing.flex.GameActivity':
-			print(222)
-			LOG=LOG+'进入服务器选择页面成功B'+'\n'
-			break
-	print(33333)
-	time.sleep(2)
-	device.touch(640,650,'DOWN_AND_UP')
+		if t_ad_event.isSet():
+			if hViewer.getFocusedWindowName()=='com.zlongame.fszhs.vivo/com.amazing.flex.GameActivity':
+				device.touch(640,650,'DOWN_AND_UP')#进入到主页面2
+				break;
+	time.sleep(3)#进入游戏的两个页面之间的跳转完全不可控
 
-	print("click fuwuqi ok")
-	time.sleep(2)
+	change_user_info()
+	close_test()
+	# time.sleep(2)
+
+	# while 1:#点击进入选取服务器页面
+	# 	if hViewer.getFocusedWindowName()=='com.zlongame.fszhs.vivo/com.amazing.flex.GameActivity':
+	# 		print(222)
+	# 		LOG=LOG+'进入服务器选择页面成功B'+'\n'
+	# 		break
+	# print(33333)
+	# time.sleep(2)
+	# device.touch(640,650,'DOWN_AND_UP')
+
+	# print("click fuwuqi ok")
+	# time.sleep(2)
 	
 
 
-	while 1:#捕捉更换账号的地方
+	# while 1:#捕捉更换账号的地方
 
-		device.touch(1238,560,'DOWN_AND_UP')#点击切换账号部分
+	# 	device.touch(1238,560,'DOWN_AND_UP')#点击切换账号部分
+def change_user_info():
+	global t_ad_event
+	signal.signal(signal.SIGINT, exitGracefully)
+	while 1:
+		try:
+			if t_ad_event.isSet():
+				device.touch(1238,560,'DOWN_AND_UP')#点击切换账号
 
-		print(1)
-		i1=0
-		i2=0
-		while 1:
-			if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity':
-				break
-		print(4,hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity')
-		print(4,eDevice.visible(By.id('id/vivo_login_loading_switch')))
-		if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and  eDevice.visible(By.id('id/vivo_login_loading_switch')):
-			time.sleep(1)
-			print("tttt")
-			device.touch(640,415,'DOWN_AND_UP')
-			i1=1
-			LOG=LOG+'捕捉vivo更换账号成功'+'\n'
-		time.sleep(2)
-		print( hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity')
-		print( eDevice.visible(By.id('id/sublist_account_exit')))	
-		if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and  eDevice.visible(By.id('id/sublist_account_exit')):
- 			i2=1
-			device.touch(490,261,'DOWN_AND_UP')
-			LOG=LOG+'退出vivo账号成功'+'\n'
+
+
+				if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and  hViewer.visible(hViewer.findViewById('id/vivo_login_loading_switch')):
+					device.touch(640,415,'DOWN_AND_UP')
+			
+		  		if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and  hViewer.visible(hViewer.findViewById('id/sublist_account_exit')):
+		 			print(333333)
+		 			break;
+
+
+
+		except:
+			print('change_user_info  error ')
+			global device
+			global eDevice
+			global hViewer
+			print('error 1')
+
+			print('errror 100')
+			device.shell('killall com.android.commands.monkey')
+			device=mr.waitForConnection() 
+			if not device:
+			    print("Please connect a device to start!")
+			  
+			else:
+			    print("Device Connected successfully!")
+			print('error 2')
+			eDevice=EasyMonkeyDevice(device)
+			print('error 3')
+			hViewer = device.getHierarchyViewer()
+			print('error 4')
+
+			continue;
+	# 	print( hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity')
+	# 	print( hViewer.visible(hViewer.findViewById('id/sublist_account_exit')))	
+	# 	if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and  hViewer.visible(hViewer.findViewById('id/sublist_account_exit')):
+ # 			i2=1
+	# 		device.touch(490,261,'DOWN_AND_UP')
+	# 		LOG=LOG+'退出vivo账号成功'+'\n'
 		
-		if i1==1 and i2==1:
-			break
-		else:
-			vivo_close_gonggao()
-	while 1:#输入用户名密码
-		print(3)
-		time.sleep(2)
-		if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and  eDevice.visible(By.id('id/account_num_input')):
- 			print(555)
- 			device.touch(700,298,'DOWN_AND_UP')
-			for x in xrange(1,50):
-				device.press("KEYCODE_DEL",md.DOWN)
-			device.type(str(number))
- 			device.touch(700,367,'DOWN_AND_UP')
-			for x in xrange(1,50):
-				device.press("KEYCODE_DEL",md.DOWN)
-			device.type(str(pwd))
- 			device.touch(640,444,'DOWN_AND_UP')
- 			LOG=LOG+'重新输入用户名密码成功'+'\n'
-			break
+	# 	if i1==1 and i2==1:
+	# 		break
+	# 	else:
+	# 		vivo_close_gonggao()
+	# while 1:#输入用户名密码
+	# 	print(3)
+	# 	time.sleep(2)
+	# 	if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and  hViewer.visible(hViewer.findViewById('id/account_num_input')):
+ # 			print(555)
+ # 			device.touch(700,298,'DOWN_AND_UP')
+	# 		for x in xrange(1,50):
+	# 			device.press("KEYCODE_DEL",md.DOWN)
+	# 		device.type(str(number))
+ # 			device.touch(700,367,'DOWN_AND_UP')
+	# 		for x in xrange(1,50):
+	# 			device.press("KEYCODE_DEL",md.DOWN)
+	# 		device.type(str(pwd))
+ # 			device.touch(640,444,'DOWN_AND_UP')
+ # 			LOG=LOG+'重新输入用户名密码成功'+'\n'
+	# 		break
 
-	vivo_close_gonggao()
+	# vivo_close_gonggao()
 
-	while 1:#打开选服页面
-		if hViewer.getFocusedWindowName()=='com.zlongame.fszhs.vivo/com.amazing.flex.GameActivity':
-			device.touch(798,563,'DOWN_AND_UP') 
-			LOG=LOG+'打开选择服务器页面成功'+'\n'
-			break	
-	time.sleep(2)
-	choose_server(int(server_id))
-	LOG=LOG+'选择服务器成功'+'\n'
-	time.sleep(2)	
-	device.touch(640,645,'DOWN_AND_UP') #开始游戏的大按钮
-	LOG=LOG+'进入游戏成功'+'\n'
+	# while 1:#打开选服页面
+	# 	if hViewer.getFocusedWindowName()=='com.zlongame.fszhs.vivo/com.amazing.flex.GameActivity':
+	# 		device.touch(798,563,'DOWN_AND_UP') 
+	# 		LOG=LOG+'打开选择服务器页面成功'+'\n'
+	# 		break	
+	# time.sleep(2)
+	# choose_server(int(server_id))
+	# LOG=LOG+'选择服务器成功'+'\n'
+	# time.sleep(2)	
+	# device.touch(640,645,'DOWN_AND_UP') #开始游戏的大按钮
+	# LOG=LOG+'进入游戏成功'+'\n'
 def account_need_createRole():
 	global device
 	global eDevice
@@ -643,7 +684,7 @@ def money_pay_V(money,number,server_id):
 			break;
 	while 1:
 		print('check price ')
-		if tag==1 and hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and eDevice.visible(By.id('id/vivo_payment_order_balance')) and  eDevice.visible(By.id('id/vivo_payment_order_price')) and  eDevice.visible(By.id('id/vivo_payment_btn_submit')):
+		if tag==1 and hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and hViewer.visible(hViewer.findViewById('id/vivo_payment_order_balance')) and  hViewer.visible(hViewer.findViewById('id/vivo_payment_order_price')) and  hViewer.visible(hViewer.findViewById('id/vivo_payment_btn_submit')):
 			v=hViewer.findViewById('id/vivo_payment_order_price')
 			order_price=hViewer.getText(v)
 			v=hViewer.findViewById('id/vivo_payment_order_balance')
@@ -666,7 +707,7 @@ def money_pay_V(money,number,server_id):
 
 	while 1:
 		print('click insert')
-		if  tag==111 and  eDevice.visible(By.id('id/vivo_payment_btn_submit')):
+		if  tag==111 and  hViewer.visible(hViewer.findViewById('id/vivo_payment_btn_submit')):
 			device.touch(650,435,'DOWN_AND_UP')#标准v钻消费的点击位置
 			tag=tag+1000
 			LOG=LOG+'点击充值最后一步成功'+str(money)+'\n'
@@ -675,7 +716,7 @@ def money_pay_V(money,number,server_id):
 	while 1:
 		print('check result')
 
-		if tag==1111 and eDevice.visible(By.id('id/vivo_payment_result_title')) and eDevice.visible(By.id('id/vivo_payment_result_content')) and eDevice.visible(By.id('id/vivo_payment_result_user_balance')) and  eDevice.visible(By.id('id/vivo_payment_result_btn1')):
+		if tag==1111 and hViewer.visible(hViewer.findViewById('id/vivo_payment_result_title')) and hViewer.visible(hViewer.findViewById('id/vivo_payment_result_content')) and hViewer.visible(hViewer.findViewById('id/vivo_payment_result_user_balance')) and  hViewer.visible(hViewer.findViewById('id/vivo_payment_result_btn1')):
 
 			v=hViewer.findViewById('id/vivo_payment_result_user_balance')
 			balance_price_result=hViewer.getText(v)
@@ -728,7 +769,7 @@ def get_balance():
 			print('?')
 		time.sleep(3)
 	while 1:
-		if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and eDevice.visible(By.id('id/vivo_payment_order_balance')) and  eDevice.visible(By.id('id/vivo_payment_order_price')) and  eDevice.visible(By.id('id/vivo_payment_btn_submit')):
+		if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and hViewer.visible(hViewer.findViewById('id/vivo_payment_order_balance')) and  hViewer.visible(hViewer.findViewById('id/vivo_payment_order_price')) and  hViewer.visible(hViewer.findViewById('id/vivo_payment_btn_submit')):
 			v=hViewer.findViewById('id/vivo_payment_order_balance')
 			balance_price_result=hViewer.getText(v)
 			print(re.sub("\D","",balance_price_result))
@@ -748,54 +789,115 @@ def static_log(name):
 	file_object.close()
 	print("log is "+name)
 
-if __name__ == '__main__':
-	# # try:
+
+def close_test():
+	cmd='adb shell am force-stop com.zlongame.fszhs.vivo'
+	process = subprocess.call(cmd, shell=True,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+	cmd='adb shell am force-stop com.vivo.sdkplugin'
+	process = subprocess.call(cmd, shell=True,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+def restart_ADB():
+	cmd='adb kill-server'
+	process = subprocess.call(cmd, shell=True,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+	cmd='adb start-server'
+	process = subprocess.call(cmd, shell=True,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+def threads_test():
+	global threads
+	t1=threading.Thread(target=ESC_key)
+	threads.append(t1)
+	t2=threading.Thread(target=game_login_vivo)
+	threads.append(t2)	
+def ESC_key():
+		signal.signal(signal.SIGINT, exitGracefully)
+		global edevice
+
+		edevice=EasyMonkeyDevice(device)
+		edevice.press('KEYCODE_BACK',md.DOWN_AND_UP)
 	
-		prop=[]#[imei,imsi,linenum,simserial,pwd,serverid,6,30,98,198,328,588,648]
-		imei=argv[1]
-		imsi=argv[2]
-		number=argv[3]
-		sim=argv[4]
-		pwd=argv[5]
-		server_id=argv[6]
-		_6_=argv[7]
-		_30_=argv[8]
-		_98_=argv[9]
-		_198_=argv[10]
-		_328_=argv[11]
-		_588_=argv[12]
-		_648_=argv[13]
+def close_vivo_ad():
+	signal.signal(signal.SIGINT, exitGracefully)
+	global t_ad_event
 
-			
-		game_login_vivo(number,pwd,server_id)
-		account_need_createRole()
-		time.sleep(3)
-		if _6_+_30_+_98_+_198_+_328_+_588_+_648_>0:
-			time.sleep(5)
-		 	device.touch(65,125,'DOWN_AND_UP') # 启动充值部分
-			for x in xrange(0,int(_6_)):
-				money_insert(6,number,server_id)
-			for x in xrange(0,int(_30_)):
-				money_insert(30,number,server_id)
-			for x in xrange(0,int(_98_)):
-				money_insert(98,number,server_id)
-			for x in xrange(0,int(_198_)):
-				money_insert(198,number,server_id)
-			for x in xrange(0,int(_328_)):
-				money_insert(328,number,server_id)
-			for x in xrange(0,int(_588_)):
-				money_insert(588,number,server_id)
-			for x in xrange(0,int(_648_)):
-				money_insert(648,number,server_id)
-		get_balance()
-		static_log('vivo')
-		game_close_vivo()
-		game_close_vivo()
-		game_close_vivo()
-	# except e:
-	# 	print(e)
-	# 	game_close_vivo()
-	# 	static_log('vivo')
 		
+	while 1:
+
+		try:
+
+			if  hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and  (hViewer.visible(hViewer.findViewById('id/vivo_acts_mutitxt_dialog_close')) or hViewer.visible(hViewer.findViewById('id/vivo_acts_singletxt_dialog_close'))):
+				ESC_key()
+				print('close ad success')
+				t_ad_event.set()
+				continue;
 
 
+			if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and hViewer.visible(hViewer.findViewById('id/vivo_app_exit_dialog_txt_layout')):
+				ESC_key()
+				print('close esc success')
+ 				continue;
+
+
+			if hViewer.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and hViewer.visible(hViewer.findViewById('id/vivo_title_bar')):
+				ESC_key()
+				print('close esc success')
+ 				continue;
+		except :
+
+			print('close_vivo_ad  error ')
+			global device
+			global eDevice
+			global hViewer
+			print('error 1')
+
+			print('errror 100')
+			device.shell('killall com.android.commands.monkey')
+			device=mr.waitForConnection() 
+			if not device:
+			    print("Please connect a device to start!")
+			  
+			else:
+			    print("Device Connected successfully!")
+			print('error 2')
+			eDevice=EasyMonkeyDevice(device)
+			print('error 3')
+			hViewer = device.getHierarchyViewer()
+			print('error 4')
+
+			continue;
+def exitGracefully(signum, frame):
+	global eDevice
+	global hViewer
+	global device
+	signal.signal(signal.SIGINT, signal.getsignal(signal.SIGINT))
+	device.shell('killall com.android.commands.monkey')
+	print(333)
+
+	print('exitGracefully  error ')
+	device=mr.waitForConnection() 
+	if not device:
+	    print("Please connect a device to start!")
+	  
+	else:
+	    print("Device Connected successfully!")
+	print('error 1')
+
+	print('errror 100')
+	print('error 2')
+	eDevice=EasyMonkeyDevice(device)
+	print('error 3')
+	hViewer = device.getHierarchyViewer()
+	print('error 4')
+	print('exitGracefully  error ')
+if __name__ == '__main__':
+	 #做一个信号标记，一旦出状况就清理掉monkey
+	 	for x in xrange(1,10):
+	 		
+			t_ad_event = threading.Event() #建立关闭公告的标记事件
+			t_main=threading.Thread(target=game_login_vivo)#主线程，进入游戏
+			threads.append(t_main)
+			t_main.setDaemon(True)
+			t_main.start()
+			t_ad=threading.Thread(target=close_vivo_ad) #关闭公告的线程
+			threads.append(t_ad)
+			t_ad.start() #关闭公告的线程启动的时候，不要用setdaemon
+			t_main.join()

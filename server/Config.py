@@ -2,10 +2,10 @@ class Config:
 
 
     mysql_conf = {
-        'host': '120.26.162.150',
+        'host': 'localhost',
         'port': 3306,
         'user': 'root',
-        'password': 'PkBJ2016@_*#',
-        'dbName': 'zilong_report',
+        'password': 'liuhao85310',
+        'dbName': 'zilong_robot',
         'charset': 'utf8'
     }
