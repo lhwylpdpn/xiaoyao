@@ -14,6 +14,12 @@ import re
 from sys import argv
 import sqlite3
 import sys
+
+global APIIP
+
+APIIP="118.190.204.182:5000"
+
+
 def connect_device():
 
 	info=os.popen('adb connect 127.0.0.1:21503')
@@ -46,19 +52,14 @@ def getinfo():
 
 
 def getsn():
-	sn = 'Y2FvaGFu'
+	sn = 'TlRRMlREVTFRMjg9'
 	return sn
 
 def get_request_info():
-	print(1)
-	url="http://118.190.204.182:5000/getinfo?sn="+getsn()+"&username="+argv[1]
+	global APIIP
+
+	url="http://"+str(APIIP)+"/getinfo?sn="+getsn()+"&username="+argv[1]
 	print(url)
-
-
-
-
-
-
 	headers=[]
 	headers.append(('User-Agent' , '673b34113cbd60dfb16ef9459614fc89_lhwylp'))
 	opener = urllib2.build_opener()
@@ -66,6 +67,41 @@ def get_request_info():
 	res=opener.open(url)
 	updateinfo(res.read())
 
+def get_request_info_API(username):
+	global APIIP
+	
+	url="http://"+str(APIIP)+"/getinfo?sn="+getsn()+"&username="+str(username)
+	print(url)
+	headers=[]
+	headers.append(('User-Agent' , '673b34113cbd60dfb16ef9459614fc89_lhwylp'))
+	opener = urllib2.build_opener()
+	opener.addheaders=headers
+	res=opener.open(url)
+	updateinfo(res.read())
+
+def get_plan(channelname,game_id):
+	global APIIP
+	url="http://"+str(APIIP)+"/getplan?channel_type="+str(channelname)+"&sn="+getsn()+"&game_id="+str(game_id)
+	print(url)
+	headers=[]
+	headers.append(('User-Agent' , '673b34113cbd60dfb16ef9459614fc89_lhwylp'))
+	opener = urllib2.build_opener()
+	opener.addheaders=headers
+	res=opener.open(url)
+	res=json.loads(res.read())["body"]
+	return res
+
+def write_log(account_id,status,des):
+	global APIIP
+	url="http://"+str(APIIP)+"/update_status?account_id="+str(account_id)+"&status="+str(status)+"&des="+str(des)
+	print(url)
+	headers=[]
+	headers.append(('User-Agent' , '673b34113cbd60dfb16ef9459614fc89_lhwylp'))
+	opener = urllib2.build_opener()
+	opener.addheaders=headers
+	res=opener.open(url)
+	res=json.loads(res.read())["status"]
+	return res
 
 def update_sqlite_for_zilong():
 	while 1:
@@ -143,6 +179,12 @@ def getprop():
 	cmd='adb shell getprop ro.product.model'
 	print('model:')
 	subprocess.call(cmd, shell=True)
+def main(user):
+	close_device()
+	get_request_info_API(user)
+	start_device()
+	update_sqlite_for_zilong()
+	getprop()
 if __name__ == '__main__':
 	close_device()
 	get_request_info()

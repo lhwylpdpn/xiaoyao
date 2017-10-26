@@ -12,18 +12,21 @@ import types
 import os
 import datetime
 import subprocess
-import threading
 
 
-global threads
-threads=[]
 global device
 global serialno
 global vc
 global tag
-tag=-1
-device, serialno = ViewClient.connectToDeviceOrExit()
-vc = ViewClient(device=device, serialno=serialno)
+
+def init():
+	global device
+	global serialno
+	global vc
+	global tag
+	tag=-1
+	device, serialno = ViewClient.connectToDeviceOrExit()
+	vc = ViewClient(device=device, serialno=serialno)
 def step0_game_start():
 	#print(vc.IS_FOCUSED_PROPERTY )
 	global device
@@ -81,20 +84,22 @@ def step_3_change_userinfo_channel_vivo(user,pwd):
 	global device
 	global serialno
 	global vc
+	global tag
 	vc.dump()
-
+	print("a1",tag)
 	if  vc.findViewById('com.vivo.sdkplugin:id/vivo_login_total_layout'):
-		print(2)
+		
 		vc.findViewById('com.vivo.sdkplugin:id/clean_account_btn').touch()
 		device.type(user)
 		vc.findViewById('com.vivo.sdkplugin:id/account_password_input').touch()
 		device.type(pwd)
 		time.sleep(3)
-		print(3)
+		
 		vc.findViewById('com.vivo.sdkplugin:id/account_login').touch()
-		print(4)
-
-	close_ad_channel_vivo(5)
+		print("a2",tag)	
+		tag=5
+		print("a3",tag)
+	#close_ad_channel_vivo(5)
 
 def close_game():
 	cmd='adb shell am force-stop com.zlongame.fszhs.vivo'
@@ -112,26 +117,35 @@ def drag(x,y,x1,y1):
 	cmd='adb shell input swipe '+str(x)+' '+str(y)+' '+str(x1)+' '+str(y1)
 	process = subprocess.call(cmd, shell=True,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-def close_ad_channel_vivo(tag_now):
+def close_ad_channel_vivo(tag_next):
 	global t_ad_event
 	global device
 	global vc	
 	global tag
 	#print( device.getFocusedWindowName())
 	if  device.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity':
-		#print(vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_mutitxt_dialog_close'))
-		#print(vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close'))
+		
+		#print('a',vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_mutitxt_dialog_close'))
+		#print('b',vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close'))
 		if  vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_mutitxt_dialog_close') or vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close'):
+			#print('c')
 			try:
-				if vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_mutitxt_dialog_close').isClickable():
-					device.press('KEYCODE_BACK')
-					print('close ad success')
-					tag=tag_now
-				if vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close').isClickable():							
-					device.press('KEYCODE_BACK')
-					print('close ad success')
-					tag=tag_now
+				print('d',vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close'))	
+				print('e',vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close'))
+				if vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_mutitxt_dialog_close') is not None:
+					
+					if vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_mutitxt_dialog_close').isClickable():
+						device.press('KEYCODE_BACK')
+						print('close ad success')
+						tag=tag_next
+				if vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close') is not None:					
+					if vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close').isClickable():	
+										
+						device.press('KEYCODE_BACK')
+						print('close ad success')
+						tag=tag_next
 			except:
+				#print('f')
 				pass
 
 
@@ -213,11 +227,38 @@ def choose_opencv_init():
 	cv2.imshow('Detected',pic2)
 	cv2.waitKey(0)
 	cv2.destroyAllWindows()
+
+def main(user_,pass_):
+	while 1:
+		try:
+			init()
+			break;
+		except:
+			print('please wait starting')
+
+	while tag<6:
+			print(tag)
+			if tag==-1:
+				step0_game_start()
+			if tag>=0:
+				Refreshdump()
+			if tag==1:
+				close_ad_channel_vivo(2)
+			if tag==2:
+				step_1_login_game_fs()
+			if tag==3:
+				step_2_login_game_fs()
+			if tag==4:
+				step_3_change_userinfo_channel_vivo(str(user_),str(pass_))
+			if tag==5:
+				close_ad_channel_vivo(6)
+			
+
 if __name__ == '__main__':
 
-			tag=5
-
-			
+	init()
+	while tag<6:
+			print(tag)
 			if tag==-1:
 				step0_game_start()
 			if tag>=0:
@@ -231,5 +272,5 @@ if __name__ == '__main__':
 			if tag==4:
 				step_3_change_userinfo_channel_vivo(13186783347,'gkbs0257')
 			if tag==5:
-				choose_opencv_init()
-				
+				close_ad_channel_vivo(6)
+			

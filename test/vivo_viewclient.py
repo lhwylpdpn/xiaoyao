@@ -34,10 +34,10 @@ def game_login_vivo():
 
 		if not t_ad_event.isSet():
 
-			print(device.isScreenOn())
-			# if device.getFocusedWindowName()=='com.zlongame.fszhs.vivo/com.amazing.flex.GameActivity':
-			# 	device.touch(640,650,'DOWN_AND_UP')#进入到主页面2
-			# 	break;
+			#print(device.isScreenOn())
+			if device.getFocusedWindowName()=='com.zlongame.fszhs.vivo/com.amazing.flex.GameActivity':
+				device.touch(640,650,'DOWN_AND_UP')#进入到主页面2
+				break;
 	time.sleep(1)
 	change_user_info()
 	# close_test()

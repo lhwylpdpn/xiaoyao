@@ -54,7 +54,7 @@ class deviceinfo:
 		rs=cursor.fetchall()		
 		if len(rs)>0:
 			for r in rs:
-				result='[{"game_id":"'+str(r[13])+'","username":"'+str(r[0])+'","password":"'+str(r[1])+'","channel_name":"'+str(r[2])+'","server_id":"'+str(r[3])+'","action_type":"'+str(r[4])+'","648_":"'+str(r[5])+'","328_":"'+str(r[6])+'","228_":"'+str(r[7])
+				result='[{"account_id":"'+str(r[12])+'","game_id":"'+str(r[13])+'","username":"'+str(r[0])+'","password":"'+str(r[1])+'","channel_name":"'+str(r[2])+'","server_id":"'+str(r[3])+'","action_type":"'+str(r[4])+'","648_":"'+str(r[5])+'","328_":"'+str(r[6])+'","228_":"'+str(r[7])
 				result+='","198_":"'+str(r[8])+'","98_":"'+str(r[9])+'","30_":"'+str(r[10])+'","6_":"'+str(r[11])+'"}]'
 				result='{"status":"200","body":'+result+'}'
 				account_id=str(r[12])
