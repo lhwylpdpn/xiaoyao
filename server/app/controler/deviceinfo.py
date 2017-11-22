@@ -47,15 +47,27 @@ class deviceinfo:
  		account_id="none"
  		username="none"
 		result=""
-		sql='select username,password,channel_name,server_id,action_type,648_,328_,228_,198_,98_,30_,6_,account_id,game_id from zilong_robot.`account_info` where status=0 and channel_name="'+str(channel_type)+'" and game_id="'+str(game_id)+'" order by DATE_FORMAT( plan_time,"%Y-%c-%d %h:%i:%s") limit 1'
+		sql='select username,password,channel_name,server_id,action_type,648_,328_,288_,198_,98_,30_,6_,account_id,game_id,548_,128_,68_,50_ from zilong_robot.`account_info` where status=0 and channel_name="'+str(channel_type)+'" and game_id="'+str(game_id)+'" order by DATE_FORMAT( plan_time,"%Y-%c-%d %h:%i:%s") limit 1'
 		print(sql)
 		cursor=mysql_r.cursor()
 		cursor.execute(sql)
 		rs=cursor.fetchall()		
 		if len(rs)>0:
 			for r in rs:
-				result='[{"account_id":"'+str(r[12])+'","game_id":"'+str(r[13])+'","username":"'+str(r[0])+'","password":"'+str(r[1])+'","channel_name":"'+str(r[2])+'","server_id":"'+str(r[3])+'","action_type":"'+str(r[4])+'","648_":"'+str(r[5])+'","328_":"'+str(r[6])+'","228_":"'+str(r[7])
-				result+='","198_":"'+str(r[8])+'","98_":"'+str(r[9])+'","30_":"'+str(r[10])+'","6_":"'+str(r[11])+'"}]'
+				result='[{"account_id":"'+str(r[12])+'","game_id":"'+str(r[13])+'","username":"'+str(r[0])+'","password":"'+str(r[1])+'","channel_name":"'+str(r[2])+'","server_id":"'+str(r[3])+'","action_type":"'+str(r[4])+'",'
+				
+				result+='"rechargeDict":[{"money":648,"time":"'+str(r[5])+'"},'
+				result+='{"money":328,"time":"'+str(r[6])+'"},'
+				result+='{"money":288,"time":"'+str(r[7])+'"},'
+				result+='{"money":198,"time":"'+str(r[8])+'"},'
+				result+='{"money":98,"time":"'+str(r[9])+'"},'
+				result+='{"money":30,"time":"'+str(r[10])+'"},'
+				result+='{"money":6,"time":"'+str(r[11])+'"},'
+				result+='{"money":548,"time":"'+str(r[14])+'"},'
+				result+='{"money":128,"time":"'+str(r[15])+'"},'
+				result+='{"money":68,"time":"'+str(r[16])+'"},'
+				result+='{"money":50,"time":"'+str(r[17])+'"}]'
+				result+='}]'
 				result='{"status":"200","body":'+result+'}'
 				account_id=str(r[12])
 				username=str(r[0])
