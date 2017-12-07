@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*- 
+#coding=utf-8
 from sys import argv
 import sys
 from com.dtmilano.android.viewclient import ViewClient, View
@@ -19,36 +18,44 @@ global serialno
 global vc
 global tag
 
-def init():
-	global device
-	global serialno
-	global vc
-	global tag
-	tag=-1
-	device, serialno = ViewClient.connectToDeviceOrExit()
-	vc = ViewClient(device=device, serialno=serialno)
-def step0_game_start():
-	#print(vc.IS_FOCUSED_PROPERTY )
-	global device
-	global serialno
-	global vc
-	global tag
-	try:
-		close_game()
-		componentName="com.zlongame.fszhs.vivo/com.amazing.flex.GameActivity"
-		FLAG_ACTIVITY_NEW_TASK = 0x10000000
-		device.startActivity(component=componentName, flags=FLAG_ACTIVITY_NEW_TASK)
-		tag=1
-	except:
-		tag=-1
-def step_1_login_game_fs():
+def init(ser):
 	global device
 	global serialno
 	global vc
 	global tag
 
-	if device.getFocusedWindowName()=='com.zlongame.fszhs.vivo/com.amazing.flex.GameActivity':
-		device.touch(640,650,'DOWN_AND_UP')#进入到主页面2
+	tag=-1
+
+	time.sleep(10)
+	print('init',ser)
+	device,serialno = ViewClient.connectToDeviceOrExit(serialno=ser)
+
+	vc = ViewClient(device=device,serialno=serialno)
+def step0_game_start(ser,componentName):
+	#print(vc.IS_FOCUSED_PROPERTY )
+	global device
+	global serialno
+	global vc
+	global tag
+
+	try:
+		close_game(ser,componentName)
+
+		FLAG_ACTIVITY_NEW_TASK = 0x10000000
+		device.startActivity(component=componentName, flags=FLAG_ACTIVITY_NEW_TASK)
+		tag=1
+	except:
+		tag=-1
+def step_1_login_game_fs(componentName):
+	global device
+	global serialno
+	global vc
+	global tag
+
+	if device.getFocusedWindowName()==componentName:
+		time.sleep(3)
+		device.touch(640,650,'DOWN_AND_UP')#进入到主页面2----封神
+
 		time.sleep(3)
 		tag=3
 
@@ -60,7 +67,8 @@ def step_2_login_game_fs():
 	i=0
 	while i<=3:
 		i+=1
-		device.touch(1238,560,'DOWN_AND_UP')#点击切换账号
+		#device.touch(1238,560,'DOWN_AND_UP')#点击切换账号----封神
+		device.touch(1230,140,'DOWN_AND_UP')#点击切换账号-全民
 		vc.dump()
 		print(33,vc.findViewById('com.vivo.sdkplugin:id/vivo_login_loading_switch'))
 
@@ -101,20 +109,24 @@ def step_3_change_userinfo_channel_vivo(user,pwd):
 		print("a3",tag)
 	#close_ad_channel_vivo(5)
 
-def close_game():
-	cmd='adb shell am force-stop com.zlongame.fszhs.vivo'
+def close_game(ser,componentName):
+	print('dddd',ser,componentName)
+	cmd='adb -s '+str(ser)+' shell am force-stop '+str(componentName.split('/')[0])
+	print(cmd)
 	process = subprocess.call(cmd, shell=True,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-	cmd='adb shell am force-stop com.vivo.sdkplugin'
+	
+	cmd='adb -s '+str(ser)+' shell am force-stop com.vivo.sdkplugin'
 	process = subprocess.call(cmd, shell=True,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-
-def restart_ADB():
-	cmd='adb kill-server'
-	process = subprocess.call(cmd, shell=True,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-	cmd='adb start-server'
-	process = subprocess.call(cmd, shell=True,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+	print(cmd)
+# def restart_ADB():
+# 	cmd='adb kill-server'
+# 	process = subprocess.call(cmd, shell=True,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+# 	cmd='adb start-server'
+# 	process = subprocess.call(cmd, shell=True,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 def drag(x,y,x1,y1):
-	cmd='adb shell input swipe '+str(x)+' '+str(y)+' '+str(x1)+' '+str(y1)
+	global ser
+	cmd='adb -s '+str(ser)+' shell input swipe '+str(x)+' '+str(y)+' '+str(x1)+' '+str(y1)
 	process = subprocess.call(cmd, shell=True,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 def close_ad_channel_vivo(tag_next):
@@ -122,31 +134,51 @@ def close_ad_channel_vivo(tag_next):
 	global device
 	global vc	
 	global tag
-	#print( device.getFocusedWindowName())
-	if  device.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity':
-		
-		#print('a',vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_mutitxt_dialog_close'))
-		#print('b',vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close'))
-		if  vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_mutitxt_dialog_close') or vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close'):
-			#print('c')
-			try:
-				print('d',vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close'))	
-				print('e',vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close'))
-				if vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_mutitxt_dialog_close') is not None:
-					
-					if vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_mutitxt_dialog_close').isClickable():
-						device.press('KEYCODE_BACK')
-						print('close ad success')
-						tag=tag_next
-				if vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close') is not None:					
-					if vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close').isClickable():	
-										
-						device.press('KEYCODE_BACK')
-						print('close ad success')
-						tag=tag_next
-			except:
-				#print('f')
-				pass
+	tag_private=0
+	test_count=0
+	while test_count<7:
+		try:
+			vc.dump()
+		except:
+			pass
+		print(test_count,"test_count")
+		if  device.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' or   device.getFocusedWindowName()=='com.zulong.jz.vivo/com.vivo.unionsdk.ui.UnionActivity' :
+			print('d0',vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close'))	
+			print('e0',vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close'))
+			print('f0',vc.findViewById('com.vivo.sdkplugin:id/titleLeftBtn_layout'))
+			if  vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_mutitxt_dialog_close') or vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close') or vc.findViewById('com.vivo.sdkplugin:id/titleLeftBtn_layout'):
+				print('d1',vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close'))	
+				print('e1',vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close'))
+				print('f1',vc.findViewById('com.vivo.sdkplugin:id/titleLeftBtn_layout'))
+				try:
+					print('d1',vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close'))	
+					print('e1',vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close'))
+					print('f1',vc.findViewById('com.vivo.sdkplugin:id/titleLeftBtn_layout'))
+					if vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_mutitxt_dialog_close') is not None:
+						
+						if vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_mutitxt_dialog_close').isClickable():
+							device.press('KEYCODE_BACK')
+							print('close ad success1')
+							tag_private=1
+					if vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close') is not None:					
+						if vc.findViewById('com.vivo.sdkplugin:id/vivo_acts_singletxt_dialog_close').isClickable():	
+											
+							device.press('KEYCODE_BACK')
+							print('close ad success2')
+							tag_private=1
+					if vc.findViewById('com.vivo.sdkplugin:id/titleLeftBtn_layout') is not None:
+						
+						if vc.findViewById('com.vivo.sdkplugin:id/titleLeftBtn_layout').isClickable():
+							vc.findViewById('com.vivo.sdkplugin:id/titleLeftBtn_layout').touch()
+							print('close ad success3')
+							tag_private=1
+				except:
+					print('f')
+					pass
+		else:
+			test_count+=1
+	if tag_private==1:
+		tag=tag_next
 
 
 			# if device.getFocusedWindowName()=='com.vivo.sdkplugin/com.vivo.unionsdk.ui.UnionActivity' and vc.findViewById('com.vivo.sdkplugin:id/vivo_app_exit_dialog_txt_layout'):
@@ -228,24 +260,35 @@ def choose_opencv_init():
 	cv2.waitKey(0)
 	cv2.destroyAllWindows()
 
-def main(user_,pass_):
-	while 1:
-		try:
-			init()
-			break;
-		except:
-			print('please wait starting')
+def main(user_,pass_,ser,comName):
 
-	while tag<6:
-			print(tag)
+	print('eeee',ser)
+	while 1:
+		print('ffff',ser)
+		try:
+			print(ser)
+			init(ser)
+			print("test"+ser)
+			break;
+		except BaseException,e:
+			print("error,"+ser)
+			print(e.message)
+			return 0
+	i=0
+	while 1:
+			
+			i+=1
+			print(i,tag)
+
 			if tag==-1:
-				step0_game_start()
+				step0_game_start(ser,comName)
 			if tag>=0:
 				Refreshdump()
+				
 			if tag==1:
 				close_ad_channel_vivo(2)
 			if tag==2:
-				step_1_login_game_fs()
+				step_1_login_game_fs(comName)
 			if tag==3:
 				step_2_login_game_fs()
 			if tag==4:
@@ -253,24 +296,27 @@ def main(user_,pass_):
 			if tag==5:
 				close_ad_channel_vivo(6)
 			
+			if tag==6:
+				return "ok"
+			if i>30:
+				return tag
+
+def main_test(user_,pass_,ser):
+
+	# while 1:
+		# try:
+	init(ser)
+			# print("test"+ser)
+			#break;
+		# except BaseException,e:
+			# print("error,"+ser)
+			# print(e.message)
+			# sys.exit()
+
+	step0_game_start()
+
+
+
 
 if __name__ == '__main__':
-
-	init()
-	while tag<6:
-			print(tag)
-			if tag==-1:
-				step0_game_start()
-			if tag>=0:
-				Refreshdump()
-			if tag==1:
-				close_ad_channel_vivo(2)
-			if tag==2:
-				step_1_login_game_fs()
-			if tag==3:
-				step_2_login_game_fs()
-			if tag==4:
-				step_3_change_userinfo_channel_vivo(13186783347,'gkbs0257')
-			if tag==5:
-				close_ad_channel_vivo(6)
-			
+	print("hahha")
