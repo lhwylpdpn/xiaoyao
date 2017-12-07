@@ -16,23 +16,35 @@ import sqlite3
 import sys
 
 global APIIP
-
+global pwd
+pwd=os.getcwd()
 APIIP="118.190.204.182:5000"
 
 
-def connect_device():
+def connect_device(device_url_port):
+		print(33333)
 
-	info=os.popen('adb connect 127.0.0.1:21503')
-	print(info.read())
+		print('waiting for andorid connect...')
+		cmd='adb connect '+str(device_url_port)
+		
+		p = subprocess.Popen(cmd, shell=True,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+		while  p.poll() is None:
+				line=p.stdout.readline()
+				line=line.strip()
+				print(line)
+				if "already connected" in str(line):
+					print line
+					break
 
-def start_device():
+
+def start_device(memu_name):
 
 	pwd=getinfo()
 
 	os.chdir(pwd)
-	cmd="MEmuConsole.exe MEmu"
-
-	process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+	cmd="MEmuConsole.exe "+str(memu_name)
+	print(cmd)
+	p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 
 
@@ -44,11 +56,12 @@ def close_device():
 	subprocess.call(cmd, shell=True)
 
 def getinfo():
-
-    config = ConfigParser.ConfigParser()
-    path = 'conf_menu.conf'
-    config.read(path)
-    return config.get('MEmu', 'MEmuname')
+	global pwd
+	config = ConfigParser.ConfigParser()
+	path = 'conf_menu.conf'
+	config.read(pwd+"\\"+path)
+	print(pwd+"\\"+path)
+	return config.get('MEmu', 'MEmuname')
 
 
 def getsn():
@@ -65,9 +78,9 @@ def get_request_info():
 	opener = urllib2.build_opener()
 	opener.addheaders=headers
 	res=opener.open(url)
-	updateinfo(res.read())
+	updateinfo(res.read(),"MEmu")
 
-def get_request_info_API(username):
+def get_request_info_API(username,memu_name):
 	global APIIP
 	
 	url="http://"+str(APIIP)+"/getinfo?sn="+getsn()+"&username="+str(username)
@@ -77,7 +90,7 @@ def get_request_info_API(username):
 	opener = urllib2.build_opener()
 	opener.addheaders=headers
 	res=opener.open(url)
-	updateinfo(res.read())
+	updateinfo(res.read(),memu_name)
 
 def get_plan(channelname,game_id):
 	global APIIP
@@ -88,12 +101,18 @@ def get_plan(channelname,game_id):
 	opener = urllib2.build_opener()
 	opener.addheaders=headers
 	res=opener.open(url)
-	res=json.loads(res.read())["body"]
+	jsons=json.loads(res.read())
+	if jsons["status"]=='200':
+		
+		res=jsons["body"]
+	else:
+		res='404'
+
 	return res
 
 def write_log(account_id,status,des):
 	global APIIP
-	url="http://"+str(APIIP)+"/update_status?account_id="+str(account_id)+"&status="+str(status)+"&des="+str(des)
+	url="http://"+str(APIIP)+"/update_status?account_id="+str(account_id)+"&status="+str(status)+"&des='"+str(des)+"'"
 	print(url)
 	headers=[]
 	headers.append(('User-Agent' , '673b34113cbd60dfb16ef9459614fc89_lhwylp'))
@@ -103,10 +122,10 @@ def write_log(account_id,status,des):
 	res=json.loads(res.read())["status"]
 	return res
 
-def update_sqlite_for_zilong():
+def update_sqlite_for_zilong(device_url_port):
 	while 1:
-		print('waiting for andorid start...')
-		cmd='adb pull /data/data/com.android.providers.settings/databases/settings.db'
+		#print('waiting for andorid start step1...')
+		cmd='adb  -s '+str(device_url_port)+' pull /data/data/com.android.providers.settings/databases/settings.db'
 		
 		process = subprocess.call(cmd, shell=True,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		if process==0:
@@ -117,19 +136,24 @@ def update_sqlite_for_zilong():
 	conn.commit()
 	conn.close()
 	while 1:
-		print('waiting for andorid start...')
-		cmd='adb remount'
+		#print('waiting for andorid start step2...')
+		cmd='adb  -s '+str(device_url_port)+' remount'
 		process = subprocess.call(cmd, shell=True,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-		cmd='adb push settings.db /data/data/com.android.providers.settings/databases/'
+		if process==0:
+			break
+	while 1:
+		#print('waiting for andorid start step3...')
+		cmd='adb  -s '+str(device_url_port)+' push settings.db /data/data/com.android.providers.settings/databases/'
 		process = subprocess.call(cmd, shell=True,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 		if process==0:
 			break		
-def updateinfo(jsondata):
+def updateinfo(jsondata,memu_name):
 	info=json.loads(jsondata)["body"]
 	#print(getinfo()+"\MemuHyperv VMs\MEmu\MEmu.memu")
 
-	file=open(getinfo()+"\MemuHyperv VMs\MEmu\MEmu.memu")
+	file=open(getinfo()+"\MemuHyperv VMs\\"+str(memu_name)+"\\"+str(memu_name)+".memu")
+	print(getinfo()+"\MemuHyperv VMs\\"+str(memu_name)+"\\"+str(memu_name)+".memu")
 	filenode=file.read()
 	file.close()
 	#filenode.replace('MACAddress="666666666666"','MACAddress="'+info[0]["macaddress"]+'"')
@@ -157,37 +181,34 @@ def updateinfo(jsondata):
 	temp=strinfo.sub('name="resolution_width" value="'+info[0]["resolution_width"]+'"',temp)
 	strinfo=re.compile('name="simserial" value=\"([^\"]*)\"')
 	temp=strinfo.sub('name="simserial" value="'+info[0]["simserial"]+'"',temp)
-	file=open(getinfo()+"\MemuHyperv VMs\MEmu\MEmu.memu","w")
+	file=open(getinfo()+"\MemuHyperv VMs\\"+str(memu_name)+"\\"+str(memu_name)+".memu","w")
 	file.write(temp)
 	file.close()
-def getprop():
-	cmd='adb shell getprop wifi.interface.mac'
+def getprop(device_url_port):
+	cmd='adb -s '+str(device_url_port)+' shell getprop wifi.interface.mac'
 	print('wifi mac:')
 	subprocess.call(cmd, shell=True)
-	cmd='adb shell getprop microvirt.imei'
+	cmd='adb -s '+str(device_url_port)+' shell getprop microvirt.imei'
 	print('imei:')
 	subprocess.call(cmd, shell=True)
-	cmd='adb shell getprop microvirt.linenum'
+	cmd='adb -s '+str(device_url_port)+' shell getprop microvirt.linenum'
 	print('linenum:')
 	subprocess.call(cmd, shell=True)
-	cmd='adb shell getprop microvirt.simserial'
+	cmd='adb -s '+str(device_url_port)+' shell getprop microvirt.simserial'
 	print('sn:')
 	subprocess.call(cmd, shell=True)
-	cmd='adb shell getprop ro.product.brand'
+	cmd='adb -s '+str(device_url_port)+' shell getprop ro.product.brand'
 	print('brand:')
 	subprocess.call(cmd, shell=True)
-	cmd='adb shell getprop ro.product.model'
+	cmd='adb -s '+str(device_url_port)+' shell getprop ro.product.model'
 	print('model:')
 	subprocess.call(cmd, shell=True)
-def main(user):
+def main(user,memu_name,device_url_port):
 	close_device()
-	get_request_info_API(user)
-	start_device()
-	update_sqlite_for_zilong()
-	getprop()
+	get_request_info_API(user,memu_name)
+	start_device(memu_name)
+	connect_device(device_url_port)
+	update_sqlite_for_zilong(device_url_port)
+	getprop(device_url_port)
 if __name__ == '__main__':
-	close_device()
-	get_request_info()
-	start_device()
-	update_sqlite_for_zilong()
-	getprop()
+	main('18328043186','MEmu_1','127.0.0.1:21513')
