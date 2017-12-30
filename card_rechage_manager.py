@@ -200,6 +200,7 @@ def main_v2(brand,memuname,ser,comname):
 		print(rechargeDict)
 		
 		follow=0
+		follow_result=0
 		while follow==0:
 
 			# try:
@@ -214,6 +215,10 @@ def main_v2(brand,memuname,ser,comname):
 				if tag=="ok":
 					print('login ok')
 					follow=1
+					follow_result=1
+				elif tag==100:
+					follow=1
+					follow_result=0#停止尝试登录
 				else:
 					print('login error')
 					#time.sleep(10)
@@ -221,7 +226,8 @@ def main_v2(brand,memuname,ser,comname):
 			else:
 				continue
 				print('brand is not oppo')
-		
+		if follow_result==0:
+			continue
 		res=""
 		for x in xrange(0,len(rechargeDict)):
 			#try:

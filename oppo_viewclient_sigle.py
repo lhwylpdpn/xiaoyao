@@ -110,7 +110,8 @@ def step_3_change_userinfo_channel_oppo(user,pwd):
 		time.sleep(1)
 		
 		vc.findViewById('com.nearme.game.service:id/btn_login').touch()
-		time.slee(4)
+		time.sleep(2)
+		vc.dump()
 		if vc.findViewById('com.nearme.game.service:id/btn_login'):
 			tag=100
 		else:
