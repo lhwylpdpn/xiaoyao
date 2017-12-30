@@ -106,6 +106,11 @@ def choose_junka():
 		vc.findViewById('com.nearme.atlas:id/gg').touch()
 		print(333)
 	time.sleep(3)
+	try:
+		vc.dump()
+	except:
+		pass
+	print(vc.findViewWithText('游戏点卡'))
 	if vc.findViewWithText('游戏点卡'):
 		vc.findViewWithText('游戏点卡').touch()
 		vc.findViewWithText('支付10元').touch()
