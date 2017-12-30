@@ -9,7 +9,7 @@ import os
 import subprocess
 from Config import Config
 import pymysql
-import IP
+
 import time
 import money_import_oppo
 import oppo_viewclient_sigle
@@ -105,7 +105,7 @@ def main(brand,memuname,ser,comname):
 	path=os.getcwd()
 	while 1:
 		plan=get_card_recharge_plan(brand)
-
+		print(plan)
 		if plan==-1 or plan==-2:
 			print(plan,'there is no plan')
 
@@ -173,10 +173,10 @@ def main(brand,memuname,ser,comname):
 	
 def main_v2(brand,memuname,ser,comname):
 
-		path=os.getcwd()
-
+	path=os.getcwd()
+	while 1:
 		plan=get_card_recharge_plan(brand)
-
+		print(plan)
 		if plan==-1 or plan==-2:
 			print(plan,'there is no plan')
 
@@ -202,11 +202,11 @@ def main_v2(brand,memuname,ser,comname):
 		follow=0
 		while follow==0:
 
-			try:
-				device_info_client.main(user,memuname,ser)
-			except:
-				print("change device error")
-				
+			# try:
+			device_info_client.main(user,memuname,ser)
+			# except:
+			# 	print("change device error")
+			# 	continue
 
 			if brand=='oppo':
 				
@@ -217,19 +217,27 @@ def main_v2(brand,memuname,ser,comname):
 				else:
 					print('login error')
 					#time.sleep(10)
-					return 0
+					continue
 			else:
-				return 0 
+				continue
 				print('brand is not oppo')
 		
 		res=""
 		for x in xrange(0,len(rechargeDict)):
 			#try:
 				result=money_import_oppo.money_import(rechargeDict[x]['card_class'],rechargeDict[x]['card_name'],rechargeDict[x]['card_pwd'],ser,'com.zlongame.fs.nearme.gamecenter/com.nearme.game.sdk.component.proxy.ProxyActivity')
-				if result!='faild':
+				if result!='faild_4' and result!='faild_other' and result!='faild_7':
 					card_reacharge_success(account_id,result[0],result[1],rechargeDict[x]['card_name'],rechargeDict[x]['card_pwd'])
-				else:
+				elif result=='faild_other': 
 					print('money inport is error'+str(rechargeDict[x]['card_name']))
+					card_reacharge_success(account_id,result[0],result[1],str(rechargeDict[x]['card_name'])+"_error",str(rechargeDict[x]['card_pwd'])+"_error")
+				elif result=='faild_4': 
+					print('money inport is error。。already recharge'+str(rechargeDict[x]['card_name']))
+					card_reacharge_success(account_id,result[0],result[1],str(rechargeDict[x]['card_name'])+"_error—recharge",str(rechargeDict[x]['card_pwd'])+"_error—recharge")
+				elif result=='faild_7': 
+					#print('money inport is error。。already recharge'+str(rechargeDict[x]['card_name']))
+					card_reacharge_success(account_id,result[0],result[1],str(rechargeDict[x]['card_name'])+"_page-show-error",str(rechargeDict[x]['card_pwd'])+"_page-show-error")
+
 			#except:
 				#print('error,money import code is error')
 		res=""
@@ -241,4 +249,4 @@ def main_v2(brand,memuname,ser,comname):
 
 
 if __name__ == '__main__':
-	main_v2('oppo','MEmu_1','127.0.0.1:21513','com.zlongame.fs.nearme.gamecenter/com.amazing.flex.GameActivity')
+	print(main_v2('oppo','MEmu_1','127.0.0.1:21513','com.zlongame.fs.nearme.gamecenter/com.amazing.flex.GameActivity'))

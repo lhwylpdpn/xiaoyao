@@ -4,8 +4,6 @@ import sys
 from com.dtmilano.android.viewclient import ViewClient, View
 import re
 from com.dtmilano.android.adb.adbclient import AdbClient
-import cv2
-import numpy as np
 import time
 import types
 import os
@@ -70,7 +68,6 @@ def into_recharge(comName):
 	global tag
 
 	click(17,75)
-	time.sleep(1)
 	click(17,75)
 	time.sleep(1)
 	try:
@@ -78,6 +75,7 @@ def into_recharge(comName):
 	except:
 		pass
 		#点完充值页面的
+	print comName,device.getFocusedWindowName()
 	if	device.getFocusedWindowName()==str(comName):
 			if  vc.findViewById('com.nearme.game.service:id/kebi_charge'):
 				print('d1',vc.findViewById('com.nearme.game.service:id/kebi_charge'))	
@@ -109,7 +107,7 @@ def choose_junka():
 		print(333)
 	if vc.findViewWithText('游戏点卡'):
 		vc.findViewWithText('游戏点卡').touch()
-		vc.findViewWithText('立即支付').touch()
+		vc.findViewWithText('支付10元').touch()
 		tag=2
 def insert_money_pre(price):
 	global t_ad_event
@@ -170,11 +168,14 @@ def insert_money_check(price):
 		vc.dump()
 	except:
 		pass
-
+	if vc.findViewById('com.nearme.atlas:id/tv_result_state') and vc.findViewById('com.nearme.atlas:id/tv_result_state')==vc.findViewWithText('充值失败'):
+		tag=7
+		return 0
 	if vc.findViewById('com.nearme.atlas:id/tv_result_state') and vc.findViewById('com.nearme.atlas:id/tv_result_state')==vc.findViewWithText('充值成功'):
 			if 	vc.findViewById('com.nearme.atlas:id/tv_order_amount')==vc.findViewWithText(str(price)):
 				money_insert=str(price)
 			while 1:
+
 				if vc.findViewById('com.nearme.atlas:id/btn_bottom'):
 					vc.findViewById('com.nearme.atlas:id/btn_bottom').touch()
 					
@@ -209,11 +210,13 @@ def insert_money_check(price):
 		money_balance=vc.findViewById('com.nearme.game.service:id/kebi_num').gettext()
 
 		tag=5
+		print( [money_insert,re.sub("\D","",money_balance)])
 		return [money_insert,re.sub("\D","",money_balance)]
 	if 	vc.findViewById('com.nearme.game.service:id/kebi_count'):
 		money_balance=vc.findViewById('com.nearme.game.service:id/kebi_count').gettext()
 
 		tag=5
+		print( [money_insert,re.sub("\D","",money_balance)])
 		return [money_insert,re.sub("\D","",money_balance)]	
 	
 def money_import(price,user_,pass_,ser_,comName):
@@ -242,8 +245,12 @@ def money_import(price,user_,pass_,ser_,comName):
 				import_result=insert_money_check(price)
 			if tag==5:
 				return import_result
-			if i>30:
-				return "faild"
+			if tag==7:
+				return "faild_7"
+			if i>15 and tag==4:
+				return "faild_4"
+			if i>15 and tag!=4:
+				return 'faild_other'
 if __name__ == '__main__':
-	result=money_import('10','1609130298012146','9785100421124445','127.0.0.1:21513','com.pokercity.bydrqp.nearme.gamecenter/com.nearme.game.sdk.component.proxy.ProxyActivity')
+	result=money_import('10','1609130298012146','9785100421124445','127.0.0.1:21513','com.zlongame.fs.nearme.gamecenter/com.nearme.game.sdk.component.proxy.ProxyActivity')
 	print result

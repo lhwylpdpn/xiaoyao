@@ -14,7 +14,7 @@ import re
 from sys import argv
 import sqlite3
 import sys
-
+import shutil
 global APIIP
 global pwd
 pwd=os.getcwd()
@@ -40,6 +40,11 @@ def connect_device(device_url_port):
 def start_device(memu_name):
 
 	pwd=getinfo()
+	if not  os.path.exists(getinfo()+"\MemuHyperv VMs\\"+str(memu_name)+"\\"+str(memu_name)+".memu_back"):
+
+		shutil.copyfile(getinfo()+"\MemuHyperv VMs\\"+str(memu_name)+"\\"+str(memu_name)+".memu",getinfo()+"\MemuHyperv VMs\\"+str(memu_name)+"\\"+str(memu_name)+".memu_back")
+
+	shutil.copyfile(getinfo()+"\MemuHyperv VMs\\"+str(memu_name)+"\\"+str(memu_name)+".memu_back",getinfo()+"\MemuHyperv VMs\\"+str(memu_name)+"\\"+str(memu_name)+".memu")
 
 	os.chdir(pwd)
 	cmd="MEmuConsole.exe "+str(memu_name)
@@ -149,6 +154,7 @@ def update_sqlite_for_zilong(device_url_port):
 		if process==0:
 			break		
 def updateinfo(jsondata,memu_name):
+	print(jsondata)
 	info=json.loads(jsondata)["body"]
 	#print(getinfo()+"\MemuHyperv VMs\MEmu\MEmu.memu")
 
@@ -156,6 +162,7 @@ def updateinfo(jsondata,memu_name):
 	print(getinfo()+"\MemuHyperv VMs\\"+str(memu_name)+"\\"+str(memu_name)+".memu")
 	filenode=file.read()
 	file.close()
+
 	#filenode.replace('MACAddress="666666666666"','MACAddress="'+info[0]["macaddress"]+'"')
 	strinfo=re.compile('MACAddress=\"([^\"]*)\"')
 	temp=strinfo.sub('MACAddress="'+info[0]["macaddress"]+'"',filenode)
@@ -211,4 +218,4 @@ def main(user,memu_name,device_url_port):
 	update_sqlite_for_zilong(device_url_port)
 	getprop(device_url_port)
 if __name__ == '__main__':
-	main('18328043186','MEmu_1','127.0.0.1:21513')
+	main('13438211365','MEmu_1','127.0.0.1:21513')
