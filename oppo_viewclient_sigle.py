@@ -4,8 +4,6 @@ import sys
 from com.dtmilano.android.viewclient import ViewClient, View
 import re
 from com.dtmilano.android.adb.adbclient import AdbClient
-import cv2
-import numpy as np
 import time
 import types
 import os
@@ -38,24 +36,24 @@ def step0_game_start(ser,componentName):
 	global vc
 	global tag
 
-	try:
-		close_game(ser,componentName)
+	#try:
+	close_game(ser,componentName)
 
-		FLAG_ACTIVITY_NEW_TASK = 0x10000000
-		device.startActivity(component=componentName, flags=FLAG_ACTIVITY_NEW_TASK)
-		tag=1
-	except:
-		tag=-1
+	FLAG_ACTIVITY_NEW_TASK = 0x10000000
+	device.startActivity(component=componentName, flags=FLAG_ACTIVITY_NEW_TASK)
+	tag=1
+	#except:
+		#tag=-1
 def step_1_login_game_fs(componentName):
 	global device
 	global serialno
 	global vc
 	global tag
-	while 1:
-		if device.getFocusedWindowName()==componentName:
-			device.touch(640,650,'DOWN_AND_UP')#进入到主页面2----封神
-			tag=3
-			break;
+
+	if device.getFocusedWindowName()==componentName:
+		device.touch(640,650,'DOWN_AND_UP')#进入到主页面2----封神
+		tag=3
+
 
 def step_2_login_game_fs():
 	global device
@@ -109,12 +107,15 @@ def step_3_change_userinfo_channel_oppo(user,pwd):
 		device.type(user)
 		vc.findViewById('com.nearme.game.service:id/edit_input_content').touch()
 		device.type(pwd)
-		time.sleep(3)
+		time.sleep(1)
 		
 		vc.findViewById('com.nearme.game.service:id/btn_login').touch()
-		print("a2",tag) 
-		tag=5
-		print("a3",tag)
+		time.slee(4)
+		if vc.findViewById('com.nearme.game.service:id/btn_login'):
+			tag=100
+		else:
+			tag=5
+	
 	#close_ad_channel_oppo(5)
 
 def close_game(ser,componentName):
@@ -149,7 +150,7 @@ def close_ad_channel_oppo(tag_next,comName):
 	global tag
 	tag_private=0
 	test_count=0
-	while test_count<10:
+	while test_count<11:
 		try:
 			vc.dump()
 		except:
@@ -162,43 +163,44 @@ def close_ad_channel_oppo(tag_next,comName):
  
 
 			try:
+                
 				if vc.findViewById('com.nearme.game.service:id/tv_get_prize_btn') is not None:
 					
 						device.press('KEYCODE_BACK')
 						print('close ad success3')
-						tag_private+=1
+						tag_private=1
 				if vc.findViewById('com.nearme.game.service:id/closeBtn') is not None:
 					
 					if vc.findViewById('com.nearme.game.service:id/closeBtn').isClickable():
 						device.press('KEYCODE_BACK')
 						print('close ad success1')
-						tag_private+=1
+						tag_private=1
 				if vc.findViewById('com.nearme.game.service:id/tips_realname_verify') is not None:				   
 					#if vc.findViewById('com.nearme.game.service:id/tips_realname_verifys').isClickable(): 
 										
 						device.press('KEYCODE_BACK')
 						print('close ad success2')
-						tag_private+=1
+						tag_private=1
 				if vc.findViewById('com.nearme.game.service:id/close') is not None:
 					#if vc.findViewById('com.nearme.game.service:id/tips_realname_verifys').isClickable(): 
 										
 						device.press('KEYCODE_BACK')
 						print('close ad success4')
-						tag_private+=1
+						tag_private=1
 				if vc.findViewById('com.nearme.game.service:id/get_it') is not None:
 					#if vc.findViewById('com.nearme.game.service:id/tips_realname_verifys').isClickable(): 
 										
 						device.press('KEYCODE_BACK')
 						print('close ad success5')
-						tag_private+=1
+						tag_private=1
 
 			except:
 				print('f')
 				pass
-			test_count+=1
+
 		else:
 			test_count+=1
-	if tag_private>1:
+	if tag_private==1:
 		tag=tag_next
 
 
@@ -292,7 +294,8 @@ def main(user_,pass_,ser,comName):
 				return "ok"
 			if i>30:
 				return tag
-
+			if tag==100:
+				return tag
 def main_test(user_,pass_,ser):
 
 	# while 1:

@@ -105,10 +105,13 @@ def choose_junka():
 	if 	vc.findViewById('com.nearme.atlas:id/gg'): # 旧版本更多支付
 		vc.findViewById('com.nearme.atlas:id/gg').touch()
 		print(333)
+	time.sleep(3)
 	if vc.findViewWithText('游戏点卡'):
 		vc.findViewWithText('游戏点卡').touch()
 		vc.findViewWithText('支付10元').touch()
 		tag=2
+	else:
+		tag=8
 def insert_money_pre(price):
 	global t_ad_event
 	global device
@@ -170,6 +173,16 @@ def insert_money_check(price):
 		pass
 	if vc.findViewById('com.nearme.atlas:id/tv_result_state') and vc.findViewById('com.nearme.atlas:id/tv_result_state')==vc.findViewWithText('充值失败'):
 		tag=7
+		while 1:
+
+			if vc.findViewById('com.nearme.atlas:id/btn_bottom_left'):
+				vc.findViewById('com.nearme.atlas:id/btn_bottom_left').touch()
+				
+				try:
+					vc.dump()
+				except:
+					pass
+				break;		
 		return 0
 	if vc.findViewById('com.nearme.atlas:id/tv_result_state') and vc.findViewById('com.nearme.atlas:id/tv_result_state')==vc.findViewWithText('充值成功'):
 			if 	vc.findViewById('com.nearme.atlas:id/tv_order_amount')==vc.findViewWithText(str(price)):
@@ -186,26 +199,26 @@ def insert_money_check(price):
 					break;
 
 
-	if vc.findViewWithText('充值成功'):
-		money_insert=str(price)
-		while 1:
-			if 	vc.findViewById('com.nearme.atlas:id/f7') or vc.findViewWithText('完成'):
-				if vc.findViewById('com.nearme.atlas:id/f7'):
-					vc.findViewById('com.nearme.atlas:id/f7').touch()
+	# if vc.findViewWithText('充值成功'):
+	# 	money_insert=str(price)
+	# 	while 1:
+	# 		if 	vc.findViewById('com.nearme.atlas:id/f7') or vc.findViewWithText('完成'):
+	# 			if vc.findViewById('com.nearme.atlas:id/f7'):
+	# 				vc.findViewById('com.nearme.atlas:id/f7').touch()
 					
-					try:
-						vc.dump()
-					except:
-						pass
-					break;
-				if vc.findViewWithText('完成'):
-					vc.findViewWithText('完成').touch()
+	# 				try:
+	# 					vc.dump()
+	# 				except:
+	# 					pass
+	# 				break;
+	# 			if vc.findViewWithText('完成'):
+	# 				vc.findViewWithText('完成').touch()
 					
-					try:
-						vc.dump()
-					except:
-						pass
-					break;
+	# 				try:
+	# 					vc.dump()
+	# 				except:
+	# 					pass
+	# 				break;
 	if 	vc.findViewById('com.nearme.game.service:id/kebi_num'):
 		money_balance=vc.findViewById('com.nearme.game.service:id/kebi_num').gettext()
 
@@ -245,8 +258,10 @@ def money_import(price,user_,pass_,ser_,comName):
 				import_result=insert_money_check(price)
 			if tag==5:
 				return import_result
-			if tag==7:
+			if tag==7: # faild recharge
 				return "faild_7"
+			if tag==8: # no jcard method
+				return "faild_8"
 			if i>15 and tag==4:
 				return "faild_4"
 			if i>15 and tag!=4:

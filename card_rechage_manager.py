@@ -226,7 +226,7 @@ def main_v2(brand,memuname,ser,comname):
 		for x in xrange(0,len(rechargeDict)):
 			#try:
 				result=money_import_oppo.money_import(rechargeDict[x]['card_class'],rechargeDict[x]['card_name'],rechargeDict[x]['card_pwd'],ser,'com.zlongame.fs.nearme.gamecenter/com.nearme.game.sdk.component.proxy.ProxyActivity')
-				if result!='faild_4' and result!='faild_other' and result!='faild_7':
+				if result!='faild_4' and result!='faild_other' and result!='faild_7' and result!='faild_8':
 					card_reacharge_success(account_id,result[0],result[1],rechargeDict[x]['card_name'],rechargeDict[x]['card_pwd'])
 				elif result=='faild_other': 
 					print('money inport is error'+str(rechargeDict[x]['card_name']))
@@ -236,7 +236,10 @@ def main_v2(brand,memuname,ser,comname):
 					card_reacharge_success(account_id,result[0],result[1],str(rechargeDict[x]['card_name'])+"_error—recharge",str(rechargeDict[x]['card_pwd'])+"_error—recharge")
 				elif result=='faild_7': 
 					#print('money inport is error。。already recharge'+str(rechargeDict[x]['card_name']))
-					card_reacharge_success(account_id,result[0],result[1],str(rechargeDict[x]['card_name'])+"_page-show-error",str(rechargeDict[x]['card_pwd'])+"_page-show-error")
+					card_reacharge_success(account_id,result[0],result[1],str(rechargeDict[x]['card_name'])+"_error_pageshow_faild",str(rechargeDict[x]['card_pwd'])+"_error_pageshow_faild")
+				elif result=='faild_8': 
+					#print('money inport is error。。already recharge'+str(rechargeDict[x]['card_name']))
+					card_reacharge_success(account_id,result[0],result[1],str(rechargeDict[x]['card_name'])+"_error_no_jcard",str(rechargeDict[x]['card_pwd'])+"_error_no_jcard")
 
 			#except:
 				#print('error,money import code is error')
