@@ -113,7 +113,7 @@ def choose_junka():
 	print(vc.findViewWithText('游戏点卡'))
 	if vc.findViewWithText('游戏点卡'):
 		vc.findViewWithText('游戏点卡').touch()
-		vc.findViewWithText('支付10元').touch()
+		vc.findViewWithText('立即支付').touch()
 		tag=2
 	else:
 		tag=8
@@ -203,27 +203,39 @@ def insert_money_check(price):
 						pass
 					break;
 
+	if vc.findViewById('com.nearme.atlas:id/f8') or vc.findViewWithText('充值失败'):
+		tag=7
+		while 1:
 
-	# if vc.findViewWithText('充值成功'):
-	# 	money_insert=str(price)
-	# 	while 1:
-	# 		if 	vc.findViewById('com.nearme.atlas:id/f7') or vc.findViewWithText('完成'):
-	# 			if vc.findViewById('com.nearme.atlas:id/f7'):
-	# 				vc.findViewById('com.nearme.atlas:id/f7').touch()
+			if vc.findViewById('com.nearme.atlas:id/f8'):
+				vc.findViewById('com.nearme.atlas:id/f8').touch()
+				
+				try:
+					vc.dump()
+				except:
+					pass
+				break;		
+		return 0
+	if vc.findViewWithText('充值成功'):
+		money_insert=str(price)
+		while 1:
+			if 	vc.findViewById('com.nearme.atlas:id/f7') or vc.findViewWithText('完成'):
+				if vc.findViewById('com.nearme.atlas:id/f7'):
+					vc.findViewById('com.nearme.atlas:id/f7').touch()
 					
-	# 				try:
-	# 					vc.dump()
-	# 				except:
-	# 					pass
-	# 				break;
-	# 			if vc.findViewWithText('完成'):
-	# 				vc.findViewWithText('完成').touch()
+					try:
+						vc.dump()
+					except:
+						pass
+					break;
+				if vc.findViewWithText('完成'):
+					vc.findViewWithText('完成').touch()
 					
-	# 				try:
-	# 					vc.dump()
-	# 				except:
-	# 					pass
-	# 				break;
+					try:
+						vc.dump()
+					except:
+						pass
+					break;
 	if 	vc.findViewById('com.nearme.game.service:id/kebi_num'):
 		money_balance=vc.findViewById('com.nearme.game.service:id/kebi_num').gettext()
 
