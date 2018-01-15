@@ -74,10 +74,10 @@ for update
 	cursor.close()
 	mysql.close()
 	return r
-def card_reacharge_success(account_id,money,balance,card,pwd):
+def card_reacharge_success(account_id,money,balance,card,pwd,status):
 	mysql = pymysql.connect(host=Config.mysql_conf['host'],port=Config.mysql_conf['port'],user=Config.mysql_conf['user'],password=Config.mysql_conf['password'],database=Config.mysql_conf['dbName'],charset=Config.mysql_conf['charset'])
 	sql="INSERT INTO `account_balance_log` VALUES('"+str(account_id)+"','"+str(balance)+"',now(),2,'"+str(money)+"','"+str(card)+"');"
-	sql+="update card_info set card_status=2,update_time=now() where card_name='"+str(card)+"' and card_pwd='"+str(pwd)+"';"
+	sql+="update card_info set card_status="+str(status)+",update_time=now() where card_name='"+str(card)+"' and card_pwd='"+str(pwd)+"';"
 	cursor=mysql.cursor()
 	cursor.execute(sql)
 	mysql.commit()
@@ -233,19 +233,19 @@ def main_v2(brand,memuname,ser,comname):
 			#try:
 				result=money_import_oppo.money_import(rechargeDict[x]['card_class'],rechargeDict[x]['card_name'],rechargeDict[x]['card_pwd'],ser,'com.zlongame.fs.nearme.gamecenter/com.nearme.game.sdk.component.proxy.ProxyActivity')
 				if result!='faild_4' and result!='faild_other' and result!='faild_7' and result!='faild_8':
-					card_reacharge_success(account_id,result[0],result[1],rechargeDict[x]['card_name'],rechargeDict[x]['card_pwd'])
+					card_reacharge_success(account_id,result[0],result[1],rechargeDict[x]['card_name'],rechargeDict[x]['card_pwd'],2)
 				elif result=='faild_other': 
 					print('money inport is error'+str(rechargeDict[x]['card_name']))
-					card_reacharge_success(account_id,result[0],result[1],str(rechargeDict[x]['card_name'])+"_error",str(rechargeDict[x]['card_pwd'])+"_error")
+					card_reacharge_success(account_id,result[0],result[1],str(rechargeDict[x]['card_name'])+"_error",str(rechargeDict[x]['card_pwd'])+"_error",0)
 				elif result=='faild_4': 
 					print('money inport is error。。already recharge'+str(rechargeDict[x]['card_name']))
-					card_reacharge_success(account_id,result[0],result[1],str(rechargeDict[x]['card_name'])+"_error—recharge",str(rechargeDict[x]['card_pwd'])+"_error—recharge")
+					card_reacharge_success(account_id,result[0],result[1],str(rechargeDict[x]['card_name'])+"_error—recharge",str(rechargeDict[x]['card_pwd'])+"_error—recharge",2)
 				elif result=='faild_7': 
 					#print('money inport is error。。already recharge'+str(rechargeDict[x]['card_name']))
-					card_reacharge_success(account_id,result[0],result[1],str(rechargeDict[x]['card_name'])+"_error_pageshow_faild",str(rechargeDict[x]['card_pwd'])+"_error_pageshow_faild")
+					card_reacharge_success(account_id,result[0],result[1],str(rechargeDict[x]['card_name'])+"_error_pageshow_faild",str(rechargeDict[x]['card_pwd'])+"_error_pageshow_faild",2)
 				elif result=='faild_8': 
 					#print('money inport is error。。already recharge'+str(rechargeDict[x]['card_name']))
-					card_reacharge_success(account_id,result[0],result[1],str(rechargeDict[x]['card_name'])+"_error_no_jcard",str(rechargeDict[x]['card_pwd'])+"_error_no_jcard")
+					card_reacharge_success(account_id,result[0],result[1],str(rechargeDict[x]['card_name'])+"_error_no_jcard",str(rechargeDict[x]['card_pwd'])+"_error_no_jcard",4)
 
 			#except:
 				#print('error,money import code is error')
