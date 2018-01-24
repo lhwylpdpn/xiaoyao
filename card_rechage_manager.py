@@ -237,16 +237,19 @@ def main_v2(brand,memuname,ser,comname):
 				elif result=='faild_other': 
 					print('money inport is error'+str(rechargeDict[x]['card_name']))
 					card_reacharge_success(account_id,result[0],result[1],str(rechargeDict[x]['card_name'])+"_error",str(rechargeDict[x]['card_pwd'])+"_error",0)
+					break
 				elif result=='faild_4': 
 					print('money inport is error。。already recharge'+str(rechargeDict[x]['card_name']))
 					card_reacharge_success(account_id,result[0],result[1],str(rechargeDict[x]['card_name'])+"_error—recharge",str(rechargeDict[x]['card_pwd'])+"_error—recharge",2)
+					break
 				elif result=='faild_7': 
 					#print('money inport is error。。already recharge'+str(rechargeDict[x]['card_name']))
 					card_reacharge_success(account_id,result[0],result[1],str(rechargeDict[x]['card_name'])+"_error_pageshow_faild",str(rechargeDict[x]['card_pwd'])+"_error_pageshow_faild",2)
+					break
 				elif result=='faild_8': 
 					#print('money inport is error。。already recharge'+str(rechargeDict[x]['card_name']))
 					card_reacharge_success(account_id,result[0],result[1],str(rechargeDict[x]['card_name'])+"_error_no_jcard",str(rechargeDict[x]['card_pwd'])+"_error_no_jcard",4)
-
+					break
 			#except:
 				#print('error,money import code is error')
 		res=""
