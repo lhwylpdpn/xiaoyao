@@ -78,11 +78,12 @@ def plan_import(name):
 	if name_==0 or pass_==0 or money_==0:
 		print('excel is error')
 		return 0
+	game_name = raw_input("game_name is ok?:")
 	sql='delete from account_info where status=99;INSERT INTO account_info VALUES '
 	for x in xrange(0,table.nrows):
 		try:
 			if int(table.cell(x,0).value)==0:
-				sql+="('robot',null,now(),'"+str(int(table.cell(x,name_).value))+"','"+str(table.cell(x,pass_).value)+"','"+str(name)+"','"+str(int(table.cell(x,money_).value))+"',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,99),"
+				sql+="('"+str(game_name)+"',null,now(),'"+str(int(table.cell(x,name_).value))+"','"+str(table.cell(x,pass_).value)+"','"+str(name)+"','"+str(int(table.cell(x,money_).value))+"',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,99),"
 				count+=1
 		except:
 			pass
@@ -98,7 +99,7 @@ INSERT INTO `card_recharge_plan`
 
 SELECT NULL,account_id,'oppo',99,10_,100_,CASE WHEN 1000_="" THEN 0 ELSE 1000_ END AS 1000_,NOW() FROM (
 SELECT account_id,
-CASE WHEN MID(c,LENGTH(c)-1,1)<8 THEN MID(c,LENGTH(c)-1,1)+1 WHEN MID(c,LENGTH(c)-1,1)>=8 THEN 0 END  AS 10_,
+CASE WHEN MID(c,LENGTH(c)-1,1)<8 AND MID(c,LENGTH(c),1)!=0 THEN MID(c,LENGTH(c)-1,1)+1  WHEN MID(c,LENGTH(c)-1,1)<8 AND MID(c,LENGTH(c),1)=0 THEN MID(c,LENGTH(c)-1,1)  WHEN MID(c,LENGTH(c)-1,1)>=8 THEN 0 END  AS 10_,
 CASE WHEN LENGTH(c)>2 AND MID(c,LENGTH(c)-1,1)<8 THEN MID(c,LENGTH(c)-2,1) WHEN  LENGTH(c)>=2 AND MID(c,LENGTH(c)-1,1)>=8 AND  MID(c,LENGTH(c)-2,1)<9 THEN  MID(c,LENGTH(c)-2,1)+1 ELSE 0 END AS 100_,
 CASE WHEN LENGTH(c)>3 AND MID(c,LENGTH(c)-2,1)<9 THEN MID(c,1,LENGTH(c)-3) WHEN  LENGTH(c)>=3 AND MID(c,LENGTH(c)-2,1)>=9 AND  MID(c,LENGTH(c)-1,1)>=8 THEN MID(c,1,LENGTH(c)-3)+1  WHEN  LENGTH(c)>=3 AND MID(c,LENGTH(c)-2,1)>=9 AND  MID(c,LENGTH(c)-1,1)<8 THEN MID(c,1,LENGTH(c)-3)  ELSE 0 END  AS 1000_,
 NOW() FROM (
