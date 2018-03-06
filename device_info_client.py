@@ -40,11 +40,11 @@ def connect_device(device_url_port):
 def start_device(memu_name):
 
 	pwd=getinfo()
-	if not  os.path.exists(getinfo()+"\MemuHyperv VMs\\"+str(memu_name)+"\\"+str(memu_name)+".memu_back"):
+	if not  os.path.exists(getinfo()+"\MemuHyperv VMs\\"+str(memu_name)+"\\"+str(memu_name)+".memu"):
 
-		shutil.copyfile(getinfo()+"\MemuHyperv VMs\\"+str(memu_name)+"\\"+str(memu_name)+".memu",getinfo()+"\MemuHyperv VMs\\"+str(memu_name)+"\\"+str(memu_name)+".memu_back")
+		#shutil.copyfile(getinfo()+"\MemuHyperv VMs\\"+str(memu_name)+"\\"+str(memu_name)+".memu",getinfo()+"\MemuHyperv VMs\\"+str(memu_name)+"\\"+str(memu_name)+".memu_back")
 
-	shutil.copyfile(getinfo()+"\MemuHyperv VMs\\"+str(memu_name)+"\\"+str(memu_name)+".memu_back",getinfo()+"\MemuHyperv VMs\\"+str(memu_name)+"\\"+str(memu_name)+".memu")
+		shutil.copyfile(getinfo()+"\MemuHyperv VMs\\"+str(memu_name)+"\\"+str(memu_name)+".memu_back",getinfo()+"\MemuHyperv VMs\\"+str(memu_name)+"\\"+str(memu_name)+".memu")
 
 	os.chdir(pwd)
 	cmd="MEmuConsole.exe "+str(memu_name)
@@ -218,4 +218,4 @@ def main(user,memu_name,device_url_port):
 	update_sqlite_for_zilong(device_url_port)
 	getprop(device_url_port)
 if __name__ == '__main__':
-	main('13438211365','MEmu_1','127.0.0.1:21513')
+	main('18626838764','MEmu_1','127.0.0.1:21513')

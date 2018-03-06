@@ -261,4 +261,8 @@ def main_v2(brand,memuname,ser,comname):
 
 
 if __name__ == '__main__':
-	print(main_v2('oppo','MEmu_1','127.0.0.1:21513','com.zlongame.fs.nearme.gamecenter/com.amazing.flex.GameActivity'))
+	while 1:
+		
+		print(main_v2('oppo','MEmu_1','127.0.0.1:21513','com.zlongame.fs.nearme.gamecenter/com.amazing.flex.GameActivity'))
+		time.sleep(10)
+		print('wait new plan')

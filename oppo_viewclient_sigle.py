@@ -66,7 +66,10 @@ def step_2_login_game_fs():
 		device.touch(1238,560,'DOWN_AND_UP')#点击切换账号----封神
 		#device.touch(1230,140,'DOWN_AND_UP')#点击切换账号-全民
 		#device.touch(1227,146,'DOWN_AND_UP')#点击切换账号-jiuzhou
-		vc.dump()
+		try:
+			vc.dump()
+		except:
+			pass
 		print(33,vc.findViewById('com.nearme.game.service:id/switch_btn'))
 
 		if   vc.findViewById('com.nearme.game.service:id/switch_btn'):
@@ -76,8 +79,10 @@ def step_2_login_game_fs():
 				
 				
 
-
-		vc.dump()
+		try:
+			vc.dump()
+		except:
+			pass
 		print(44,vc.findViewById('com.nearme.game.service:id/nmgc_switch_account_tx'))
 
 		print(55,vc.findViewById('com.nearme.game.service:id/btn_login'))
@@ -97,7 +102,10 @@ def step_3_change_userinfo_channel_oppo(user,pwd):
 	global serialno
 	global vc
 	global tag
-	vc.dump()
+	try:
+		vc.dump()
+	except:
+		pass
 	print("a1",tag)
 	if  vc.findViewById('com.nearme.game.service:id/btn_login'):
 		
@@ -111,7 +119,10 @@ def step_3_change_userinfo_channel_oppo(user,pwd):
 		
 		vc.findViewById('com.nearme.game.service:id/btn_login').touch()
 		time.sleep(2)
-		vc.dump()
+		try:
+			vc.dump()
+		except:
+			pass
 		if vc.findViewById('com.nearme.game.service:id/btn_login'):
 			tag=100
 		else:
