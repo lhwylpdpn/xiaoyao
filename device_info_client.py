@@ -211,11 +211,11 @@ def getprop(device_url_port):
 	print('model:')
 	subprocess.call(cmd, shell=True)
 def main(user,memu_name,device_url_port):
-	close_device()
+	#close_device()
 	get_request_info_API(user,memu_name)
 	start_device(memu_name)
 	connect_device(device_url_port)
 	update_sqlite_for_zilong(device_url_port)
 	getprop(device_url_port)
 if __name__ == '__main__':
-	main('18626838764','MEmu_1','127.0.0.1:21513')
+	close_device()

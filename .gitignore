@@ -1,1 +1,6 @@
 *.xlsx
+*.pyc
+Config.py
+*.pyc
+*.exe
+vivo_viewclient_sigle.pyc

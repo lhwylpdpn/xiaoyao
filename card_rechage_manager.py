@@ -13,6 +13,21 @@ import pymysql
 import time
 import money_import_oppo
 import oppo_viewclient_sigle
+
+def get_all_job(channel):
+	mysql = pymysql.connect(host=Config.mysql_conf['host'],port=Config.mysql_conf['port'],user=Config.mysql_conf['user'],password=Config.mysql_conf['password'],database=Config.mysql_conf['dbName'],charset=Config.mysql_conf['charset'])
+	sql="SELECT COUNT(*) FROM `card_recharge_plan` WHERE channel_name='"+str(channel)+"' AND STATUS=0"
+	cursor=mysql.cursor()
+	cursor.execute(sql)
+	res=0
+	rs=cursor.fetchall()
+	if len(rs)==1:
+		for r in rs:
+			res=r[0]
+
+	cursor.close()
+	mysql.close()	
+	return res
 def get_card_recharge_plan(channel):
 	mysql = pymysql.connect(host=Config.mysql_conf['host'],port=Config.mysql_conf['port'],user=Config.mysql_conf['user'],password=Config.mysql_conf['password'],database=Config.mysql_conf['dbName'],charset=Config.mysql_conf['charset'])
 	update_sql=""
@@ -173,8 +188,8 @@ def main(brand,memuname,ser,comname):
 	
 def main_v2(brand,memuname,ser,comname):
 
-	path=os.getcwd()
-	while 1:
+		path=os.getcwd()
+	#while 1:
 		plan=get_card_recharge_plan(brand)
 		print(plan)
 		if plan==-1 or plan==-2:
@@ -226,8 +241,8 @@ def main_v2(brand,memuname,ser,comname):
 			else:
 				continue
 				print('brand is not oppo')
-		if follow_result==0:
-			continue
+		# if follow_result==0:
+		# 	continue
 		res=""
 		for x in xrange(0,len(rechargeDict)):
 			#try:
